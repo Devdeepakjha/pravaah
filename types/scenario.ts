@@ -7,6 +7,8 @@ export interface ScenarioResult {
   baselineRiskScore: number;
   simulatedRiskScore: number;
   riskDelta?: number;
+  baselineRain24h?: number;
+  simulatedRain24h?: number;
   baselineRiskLevel?: string;
   simulatedRiskLevel?: string;
   projectedSlopeFailures: number;

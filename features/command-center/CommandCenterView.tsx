@@ -287,6 +287,7 @@ export function CommandCenterView() {
         <ZoneDrawer
           zone={selectedZone}
           onClose={handleDeselectZone}
+          onViewResponsePlan={() => setIsPrioritiesOpen(true)}
           onDispatchProtocol={handleDispatchProtocol}
           isDispatched={Boolean(dispatchedProtocols[selectedZone.id])}
         />
