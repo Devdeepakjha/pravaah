@@ -10,6 +10,9 @@ import { RiskLegend } from '@/maps/RiskLegend';
 import { ZoneDrawer } from './ZoneDrawer';
 import { AlertsModal } from '@/features/alerts/AlertsModal';
 import { SettingsModal } from './SettingsModal';
+import { CitizenViewModal } from '@/features/citizen/CitizenViewModal';
+import { ResponsePrioritiesModal } from '@/features/response/ResponsePrioritiesModal';
+import { FieldReportModal } from '@/features/field-reports/FieldReportModal';
 
 import { RiskZone } from '@/types/riskZone';
 import { RoadCorridor } from '@/types/roadStatus';
@@ -18,12 +21,12 @@ import { Infrastructure } from '@/types/infrastructure';
 import { Alert, SituationOverview } from '@/types/alert';
 
 import { getRiskZones } from '@/services/riskZoneService';
-import { getRoadCorridors } from '@/services/roadStatusService';
+import { getRoadCorridors, calculateAlternativeRoute } from '@/services/roadStatusService';
 import { getFieldReports } from '@/services/fieldReportService';
 import { getInfrastructure } from '@/services/infrastructureService';
 import { getActiveAlerts, getSituationOverview } from '@/services/alertService';
 import { SIKKIM_CENTER, DEFAULT_MAP_ZOOM } from '@/lib/geo';
-import { CheckCircle2, ShieldAlert, X } from 'lucide-react';
+import { CheckCircle2, ShieldAlert, X, Navigation } from 'lucide-react';
 
 export function CommandCenterView() {
   // Data states
@@ -39,6 +42,10 @@ export function CommandCenterView() {
   const [activeNavTab, setActiveNavTab] = useState<NavigationTab>('map');
   const [isAlertsOpen, setIsAlertsOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isCitizenModeOpen, setIsCitizenModeOpen] = useState(false);
+  const [isPrioritiesOpen, setIsPrioritiesOpen] = useState(false);
+  const [isFieldReportOpen, setIsFieldReportOpen] = useState(false);
+  const [activeRoutePlan, setActiveRoutePlan] = useState<any | null>(null);
 
   // Dispatched protocols tracking
   const [dispatchedProtocols, setDispatchedProtocols] = useState<Record<string, boolean>>({});
@@ -154,6 +161,15 @@ export function CommandCenterView() {
     setActiveNavTab(tab);
     if (tab === 'alerts') {
       setIsAlertsOpen(true);
+    } else if (tab === 'field-reports') {
+      setIsFieldReportOpen(true);
+    } else if (tab === 'scenarios' || tab === 'forecast') {
+      const eastSikkim = riskZones.find((z) => z.id === 'zone-east-sikkim') || riskZones[0];
+      if (eastSikkim) {
+        handleSelectZone(eastSikkim);
+      }
+    } else if (tab === 'analytics') {
+      setIsPrioritiesOpen(true);
     } else if (tab === 'settings') {
       setIsSettingsOpen(true);
     }
@@ -184,6 +200,7 @@ export function CommandCenterView() {
           fieldReports={fieldReports}
           infrastructure={infrastructure}
           selectedZone={selectedZone}
+          activeRoutePlan={activeRoutePlan}
           onSelectZone={handleSelectZone}
           onMapClick={handleDeselectZone}
           mapRefCallback={(instance) => {
@@ -191,6 +208,31 @@ export function CommandCenterView() {
           }}
         />
       </div>
+
+      {/* Floating Active Detour Banner */}
+      {activeRoutePlan && (
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-30 bg-slate-900/95 backdrop-blur-md text-white px-4 py-2.5 rounded-2xl shadow-floating border border-emerald-500/60 text-xs flex items-center gap-3 animate-in fade-in zoom-in-95 duration-150">
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="font-bold text-emerald-400">Detour Active:</span>
+            <span className="font-medium text-slate-100">
+              {activeRoutePlan.alternativeRoute?.name || 'NH-717A Reshi Bypass'}
+            </span>
+            <span className="text-emerald-300 text-[11px] font-semibold bg-emerald-950/80 px-1.5 py-0.5 rounded border border-emerald-800">
+              +{activeRoutePlan.alternativeRoute?.distanceDeltaKm || 43} km · +{activeRoutePlan.alternativeRoute?.timeDeltaMins || 80} min
+            </span>
+            <span className="text-slate-400 text-[11px] hidden md:inline">
+              (NH-10 blocked at Km 44)
+            </span>
+          </div>
+          <button
+            onClick={() => setActiveRoutePlan(null)}
+            className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[11px] font-semibold border border-slate-700 cursor-pointer ml-2 transition-colors"
+          >
+            Clear Detour
+          </button>
+        </div>
+      )}
 
       {/* Floating Dispatch / Alert Confirmation Toast */}
       {dispatchToast && (
@@ -214,6 +256,7 @@ export function CommandCenterView() {
           onSelectZone={handleSelectZone}
           onOpenAlerts={() => setIsAlertsOpen(true)}
           onSelectLocation={handleSelectLocation}
+          onOpenCitizenMode={() => setIsCitizenModeOpen(true)}
         />
       )}
 
@@ -249,6 +292,56 @@ export function CommandCenterView() {
       )}
 
       {/* 6. MODALS & FLYOUTS */}
+      <CitizenViewModal
+        isOpen={isCitizenModeOpen}
+        onClose={() => setIsCitizenModeOpen(false)}
+        riskZones={riskZones}
+        selectedZone={selectedZone}
+        onSelectZone={handleSelectZone}
+        onOpenReportModal={() => {
+          setIsCitizenModeOpen(false);
+          setIsFieldReportOpen(true);
+        }}
+        onShowSafeRoute={async () => {
+          const plan = await calculateAlternativeRoute('sevoke', 'gangtok');
+          setActiveRoutePlan(plan);
+          setIsCitizenModeOpen(false);
+          setDispatchToast('Activated safe detour corridor via NH-717A Reshi-Algarah bypass.');
+        }}
+      />
+
+      <ResponsePrioritiesModal
+        isOpen={isPrioritiesOpen}
+        onClose={() => {
+          setIsPrioritiesOpen(false);
+          setActiveNavTab('map');
+        }}
+        onSelectZoneId={(zid) => {
+          const z = riskZones.find((item) => item.id === zid);
+          if (z) handleSelectZone(z);
+        }}
+        onShowRoutePlan={(plan) => {
+          setActiveRoutePlan(plan);
+          setIsPrioritiesOpen(false);
+          setDispatchToast('Activated alternative route corridor via NH-717A bypass.');
+        }}
+      />
+
+      <FieldReportModal
+        isOpen={isFieldReportOpen}
+        onClose={() => {
+          setIsFieldReportOpen(false);
+          setActiveNavTab('map');
+        }}
+        activeZone={selectedZone}
+        onSubmitSuccess={(newReport) => {
+          setFieldReports((prev) => [newReport, ...prev]);
+          setDispatchToast(
+            `Field evidence submitted for ${newReport.district}. Screened: ${newReport.visionAnalysis?.assessment || 'Recorded'}`
+          );
+        }}
+      />
+
       <AlertsModal
         isOpen={isAlertsOpen}
         onClose={() => {

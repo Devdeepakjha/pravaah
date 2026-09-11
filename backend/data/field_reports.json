@@ -1,0 +1,329 @@
+[
+  {
+    "id": "report-f571f0f4",
+    "title": "PyTest Automated Tension Crack Observation",
+    "incidentType": "TENSION_CRACK",
+    "locationName": "Dikchu Km 18",
+    "district": "Gangtok",
+    "state": "Sikkim",
+    "coordinates": {
+      "lat": 27.38,
+      "lng": 88.59
+    },
+    "reporter": {
+      "name": "Test Geologist",
+      "role": "QA Engineer",
+      "agency": "PRAVAAH Automated Test Suite"
+    },
+    "status": "VERIFIED_AI_SCREENED",
+    "urgency": "HIGH",
+    "severity": "HIGH",
+    "timestamp": "2026-09-11T08:26:22.001736+00:00",
+    "observations": "Fresh transverse crack 12mm wide expanding across the roadway scarp.",
+    "affectedCorridor": "Local Highway/Link Road",
+    "aiAnalysis": {
+      "severity": "HIGH",
+      "operational_priority_influence": "P1",
+      "confidence": 0.85,
+      "evidence": [
+        "Extensive exposed bedrock/soil (100.0% bare surface) indicative of fresh scarp or slope scar",
+        "Observer reported ground tension cracks (corroborates edge detection)"
+      ],
+      "metrics": {
+        "soil_exposure_pct": 100.0,
+        "vegetation_pct": 0.0,
+        "edge_fracture_density": 0.0,
+        "texture_roughness_variance": 0.0,
+        "moisture_saturation_pct": 0.0
+      },
+      "analysis_source": "PRAVAAH Computer Vision Engine v1.0 (Colorimetry & Edge Discontinuity Analysis)",
+      "disclaimer": "AI-assisted visual assessment (preliminary screening, not confirmed geological survey)."
+    },
+    "imageUrl": "/uploads/field_images/report-f571f0f4.png",
+    "dataSource": "COMMUNITY_REPORT"
+  },
+  {
+    "id": "report-c50d4580",
+    "title": "PyTest Automated Tension Crack Observation",
+    "incidentType": "TENSION_CRACK",
+    "locationName": "Dikchu Km 18",
+    "district": "Gangtok",
+    "state": "Sikkim",
+    "coordinates": {
+      "lat": 27.38,
+      "lng": 88.59
+    },
+    "reporter": {
+      "name": "Test Geologist",
+      "role": "QA Engineer",
+      "agency": "PRAVAAH Automated Test Suite"
+    },
+    "status": "VERIFIED_AI_SCREENED",
+    "urgency": "HIGH",
+    "severity": "HIGH",
+    "timestamp": "2026-09-11T08:23:36.886174+00:00",
+    "observations": "Fresh transverse crack 12mm wide expanding across the roadway scarp.",
+    "affectedCorridor": "Local Highway/Link Road",
+    "aiAnalysis": {
+      "severity": "HIGH",
+      "operational_priority_influence": "P1",
+      "confidence": 0.85,
+      "evidence": [
+        "Extensive exposed bedrock/soil (100.0% bare surface) indicative of fresh scarp or slope scar",
+        "Observer reported ground tension cracks (corroborates edge detection)"
+      ],
+      "metrics": {
+        "soil_exposure_pct": 100.0,
+        "vegetation_pct": 0.0,
+        "edge_fracture_density": 0.0,
+        "texture_roughness_variance": 0.0,
+        "moisture_saturation_pct": 0.0
+      },
+      "analysis_source": "PRAVAAH Computer Vision Engine v1.0 (Colorimetry & Edge Discontinuity Analysis)",
+      "disclaimer": "AI-assisted visual assessment (preliminary screening, not confirmed geological survey)."
+    },
+    "imageUrl": "/uploads/field_images/report-c50d4580.png",
+    "dataSource": "COMMUNITY_REPORT"
+  },
+  {
+    "id": "report-90afd7ec",
+    "title": "PyTest Automated Tension Crack Observation",
+    "incidentType": "TENSION_CRACK",
+    "locationName": "Dikchu Km 18",
+    "district": "Gangtok",
+    "state": "Sikkim",
+    "coordinates": {
+      "lat": 27.38,
+      "lng": 88.59
+    },
+    "reporter": {
+      "name": "Test Geologist",
+      "role": "QA Engineer",
+      "agency": "PRAVAAH Automated Test Suite"
+    },
+    "status": "VERIFIED_AI_SCREENED",
+    "urgency": "HIGH",
+    "severity": "HIGH",
+    "timestamp": "2026-09-11T08:22:52.980585+00:00",
+    "observations": "Fresh transverse crack 12mm wide expanding across the roadway scarp.",
+    "affectedCorridor": "Local Highway/Link Road",
+    "aiAnalysis": {
+      "severity": "HIGH",
+      "operational_priority_influence": "P1",
+      "confidence": 0.85,
+      "evidence": [
+        "Extensive exposed bedrock/soil (100.0% bare surface) indicative of fresh scarp or slope scar",
+        "Observer reported ground tension cracks (corroborates edge detection)"
+      ],
+      "metrics": {
+        "soil_exposure_pct": 100.0,
+        "vegetation_pct": 0.0,
+        "edge_fracture_density": 0.0,
+        "texture_roughness_variance": 0.0,
+        "moisture_saturation_pct": 0.0
+      },
+      "analysis_source": "PRAVAAH Computer Vision Engine v1.0 (Colorimetry & Edge Discontinuity Analysis)",
+      "disclaimer": "AI-assisted visual assessment (preliminary screening, not confirmed geological survey)."
+    },
+    "imageUrl": "/uploads/field_images/report-90afd7ec.png",
+    "dataSource": "COMMUNITY_REPORT"
+  },
+  {
+    "id": "report-970e9298",
+    "title": "PyTest Automated Tension Crack Observation",
+    "incidentType": "TENSION_CRACK",
+    "locationName": "Dikchu Km 18",
+    "district": "Gangtok",
+    "state": "Sikkim",
+    "coordinates": {
+      "lat": 27.38,
+      "lng": 88.59
+    },
+    "reporter": {
+      "name": "Test Geologist",
+      "role": "QA Engineer",
+      "agency": "PRAVAAH Automated Test Suite"
+    },
+    "status": "VERIFIED_AI_SCREENED",
+    "urgency": "HIGH",
+    "severity": "HIGH",
+    "timestamp": "2026-09-11T08:21:31.976293+00:00",
+    "observations": "Fresh transverse crack 12mm wide expanding across the roadway scarp.",
+    "affectedCorridor": "Local Highway/Link Road",
+    "aiAnalysis": {
+      "severity": "HIGH",
+      "operational_priority_influence": "P1",
+      "confidence": 0.85,
+      "evidence": [
+        "Extensive exposed bedrock/soil (100.0% bare surface) indicative of fresh scarp or slope scar",
+        "Observer reported ground tension cracks (corroborates edge detection)"
+      ],
+      "metrics": {
+        "soil_exposure_pct": 100.0,
+        "vegetation_pct": 0.0,
+        "edge_fracture_density": 0.0,
+        "texture_roughness_variance": 0.0,
+        "moisture_saturation_pct": 0.0
+      },
+      "analysis_source": "PRAVAAH Computer Vision Engine v1.0 (Colorimetry & Edge Discontinuity Analysis)",
+      "disclaimer": "AI-assisted visual assessment (preliminary screening, not confirmed geological survey)."
+    },
+    "imageUrl": "/uploads/field_images/report-970e9298.png",
+    "dataSource": "COMMUNITY_REPORT"
+  },
+  {
+    "id": "report-258b604c",
+    "title": "Test Tension Crack in Singtam",
+    "incidentType": "SLUMP",
+    "locationName": "Singtam Sector Km 44",
+    "district": "East Sikkim",
+    "state": "Sikkim",
+    "coordinates": {
+      "lat": 27.2405,
+      "lng": 88.504
+    },
+    "reporter": {
+      "name": "Field Observer",
+      "role": "Citizen / Ward Volunteer",
+      "agency": "Community Disaster Response"
+    },
+    "status": "VERIFIED_AI_SCREENED",
+    "urgency": "CRITICAL",
+    "severity": "CRITICAL",
+    "timestamp": "2026-09-11T08:00:10.377274+00:00",
+    "observations": "Fresh transverse crack with exposed mud and rockfall debris",
+    "affectedCorridor": "Local Highway/Link Road",
+    "aiAnalysis": {
+      "severity": "CRITICAL",
+      "operational_priority_influence": "P1",
+      "confidence": 0.91,
+      "evidence": [
+        "Extensive exposed bedrock/soil (100.0% bare surface) indicative of fresh scarp or slope scar",
+        "Observer reported ground tension cracks (corroborates edge detection)",
+        "Observer reported roadway obstruction / rubble accumulation"
+      ],
+      "metrics": {
+        "soil_exposure_pct": 100.0,
+        "vegetation_pct": 0.0,
+        "edge_fracture_density": 0.0,
+        "texture_roughness_variance": 0.0,
+        "moisture_saturation_pct": 0.0
+      },
+      "analysis_source": "PRAVAAH Computer Vision Engine v1.0 (Colorimetry & Edge Discontinuity Analysis)",
+      "disclaimer": "AI-assisted visual assessment (preliminary screening, not confirmed geological survey)."
+    },
+    "imageUrl": "/uploads/field_images/report-258b604c.jpg",
+    "dataSource": "COMMUNITY_REPORT"
+  },
+  {
+    "id": "report-singtam-slump",
+    "title": "Singtam Slump & Tension Cracks",
+    "incidentType": "SLUMP",
+    "locationName": "Singtam Upper Ridge (Km 43.8)",
+    "district": "East Sikkim",
+    "state": "Sikkim",
+    "coordinates": {
+      "lat": 27.2405,
+      "lng": 88.504
+    },
+    "reporter": {
+      "name": "Dr. T. Lepcha",
+      "role": "Senior Engineering Geologist",
+      "agency": "Geological Survey of India (GSI)"
+    },
+    "status": "VERIFIED",
+    "urgency": "HIGH",
+    "severity": "HIGH",
+    "timestamp": "2026-09-11T06:30:00Z",
+    "observations": "Transverse crown tension cracks widening at 4mm/hour. Subsurface seepage evident along toe cut.",
+    "affectedCorridor": "NH-10 Km 44",
+    "estimatedDebrisVolumeM3": 4500,
+    "aiAnalysis": {
+      "severity": "HIGH",
+      "operational_priority_influence": "P1",
+      "confidence": 0.88,
+      "evidence": [
+        "Extensive exposed bedrock/soil (58.4% bare surface) indicative of fresh scarp",
+        "Prominent linear edge discontinuity: visible tensile fracture pattern detected",
+        "High textural roughness: debris flow boulder deposition observed"
+      ],
+      "analysis_source": "PRAVAAH Computer Vision Engine v1.0 (Colorimetry & Edge Discontinuity Analysis)",
+      "disclaimer": "AI-assisted visual assessment (preliminary screening, not confirmed geological survey)."
+    },
+    "imageUrl": "/uploads/field_images/sample_singtam_slump.jpg",
+    "dataSource": "FIELD_SURVEY"
+  },
+  {
+    "id": "report-dikchu-scarp",
+    "title": "Dikchu Escarpment Rockfall",
+    "incidentType": "ROCKFALL",
+    "locationName": "Dikchu Powerhouse Road",
+    "district": "Mangan",
+    "state": "Sikkim",
+    "coordinates": {
+      "lat": 27.398,
+      "lng": 88.525
+    },
+    "reporter": {
+      "name": "Capt. R. Sharma",
+      "role": "Officer Commanding 758 BRTF",
+      "agency": "Border Roads Organisation (BRO)"
+    },
+    "status": "VERIFIED",
+    "urgency": "MEDIUM",
+    "severity": "MEDIUM",
+    "timestamp": "2026-09-11T05:15:00Z",
+    "observations": "Periodic wedge failures of jointed phyllite. Single-lane movement restored with spotters.",
+    "affectedCorridor": "Singtam - Dikchu Link",
+    "estimatedDebrisVolumeM3": 350,
+    "aiAnalysis": {
+      "severity": "MEDIUM",
+      "operational_priority_influence": "P2",
+      "confidence": 0.81,
+      "evidence": [
+        "Fragmented colluvial material evident along toe margin",
+        "Moderate structural lineament / fracture boundary detected on slope face"
+      ],
+      "analysis_source": "PRAVAAH Computer Vision Engine v1.0",
+      "disclaimer": "AI-assisted visual assessment (preliminary screening, not confirmed geological survey)."
+    },
+    "imageUrl": "/uploads/field_images/sample_dikchu_rockfall.jpg",
+    "dataSource": "FIELD_SURVEY"
+  },
+  {
+    "id": "report-jatinga-subsidence",
+    "title": "Jatinga Valley Railway Berm Subsidence",
+    "incidentType": "SUBSIDENCE",
+    "locationName": "Jatinga Km 62 Trackside",
+    "district": "Dima Hasao",
+    "state": "Assam",
+    "coordinates": {
+      "lat": 25.145,
+      "lng": 93.045
+    },
+    "reporter": {
+      "name": "P. Bora",
+      "role": "Permanent Way Inspector",
+      "agency": "Northeast Frontier Railway (NFR)"
+    },
+    "status": "VERIFIED",
+    "urgency": "MEDIUM",
+    "severity": "MEDIUM",
+    "timestamp": "2026-09-11T03:00:00Z",
+    "observations": "Ballast shoulder dropped 12cm over 40m length. Speed restriction of 20 km/h in force.",
+    "affectedCorridor": "Lumding - Badarpur Hill Section",
+    "estimatedDebrisVolumeM3": 120,
+    "aiAnalysis": {
+      "severity": "MEDIUM",
+      "operational_priority_influence": "P2",
+      "confidence": 0.79,
+      "evidence": [
+        "Subsurface water seepage / saturated mud accumulation identified"
+      ],
+      "analysis_source": "PRAVAAH Computer Vision Engine v1.0",
+      "disclaimer": "AI-assisted visual assessment (preliminary screening, not confirmed geological survey)."
+    },
+    "imageUrl": "/uploads/field_images/sample_jatinga_subsidence.jpg",
+    "dataSource": "FIELD_SURVEY"
+  }
+]

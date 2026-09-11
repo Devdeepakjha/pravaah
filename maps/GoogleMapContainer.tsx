@@ -29,6 +29,7 @@ interface GoogleMapContainerProps {
   onZoomOutRef?: (fn: () => void) => void;
   onRecenterRef?: (fn: () => void) => void;
   mapRefCallback?: (instance: any) => void;
+  activeRoutePlan?: any;
 }
 
 export default function GoogleMapContainer(props: GoogleMapContainerProps) {

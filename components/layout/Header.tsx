@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Bell, Globe, ShieldAlert, Sparkles, X, MapPin } from 'lucide-react';
+import { Search, Bell, Globe, ShieldAlert, Sparkles, X, MapPin, Users } from 'lucide-react';
 import { RiskZone } from '@/types/riskZone';
 import { searchLocations } from '@/services/riskZoneService';
 import { SituationOverview } from '@/types/alert';
@@ -12,6 +12,7 @@ interface HeaderProps {
   onSelectZone: (zone: RiskZone) => void;
   onOpenAlerts: () => void;
   onSelectLocation?: (coords: { lat: number; lng: number }) => void;
+  onOpenCitizenMode?: () => void;
 }
 
 export function Header({
@@ -20,6 +21,7 @@ export function Header({
   onSelectZone,
   onOpenAlerts,
   onSelectLocation,
+  onOpenCitizenMode,
 }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<{
@@ -64,12 +66,13 @@ export function Header({
         <div className="flex flex-col leading-tight">
           <div className="flex items-center gap-1.5">
             <span className="font-bold text-slate-900 tracking-tight text-sm">PRAVAAH</span>
-            <span className="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200">
-              DEMO
+            <span className="text-[9px] font-semibold px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              XGBoost ML
             </span>
           </div>
           <span className="text-[10px] font-medium text-slate-500 uppercase tracking-wide">
-            Landslide Intelligence
+            Disaster Intelligence System
           </span>
         </div>
       </div>
@@ -197,6 +200,16 @@ export function Header({
 
       {/* Right: Controls & Profile */}
       <div className="flex items-center gap-2 bg-white/95 backdrop-blur-md p-1.5 rounded-xl shadow-floating border border-slate-200/80 pointer-events-auto">
+        {/* Citizen View Mode Button */}
+        <button
+          onClick={onOpenCitizenMode}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-semibold transition-colors cursor-pointer"
+          title="Plain-language Citizen & Community View"
+        >
+          <Users className="w-3.5 h-3.5 text-emerald-600" />
+          <span className="hidden sm:inline">Citizen View</span>
+        </button>
+
         {/* Alert Notifications */}
         <button
           onClick={onOpenAlerts}

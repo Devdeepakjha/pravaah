@@ -69,3 +69,8 @@ ml/data/raw/*.gpkg
 ml/data/raw/*.zip
 ml/data/raw/*.rar
 
+# Uploaded test media
+backend/uploads/field_images/*
+!backend/uploads/field_images/.gitkeep
+
+

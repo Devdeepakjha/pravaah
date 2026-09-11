@@ -36,5 +36,13 @@ export interface FieldReport {
     analysis_source: string;
     disclaimer: string;
   };
+  visionAnalysis?: {
+    assessment: string;
+    debris_coverage_pct: number;
+    discontinuity_score: number;
+    color_anomaly_detected: boolean;
+    confidence_tier: string;
+    disclaimer: string;
+  };
   dataSource: DataSource;
 }

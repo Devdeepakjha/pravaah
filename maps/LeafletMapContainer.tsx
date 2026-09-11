@@ -25,6 +25,7 @@ interface LeafletMapContainerProps {
   onSelectFieldReport?: (report: FieldReport) => void;
   onMapClick?: () => void;
   mapRefCallback?: (mapInstance: L.Map | null) => void;
+  activeRoutePlan?: any;
 }
 
 export default function LeafletMapContainer({
@@ -42,6 +43,7 @@ export default function LeafletMapContainer({
   onSelectFieldReport,
   onMapClick,
   mapRefCallback,
+  activeRoutePlan,
 }: LeafletMapContainerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
@@ -327,7 +329,81 @@ export default function LeafletMapContainer({
         marker.addTo(group);
       });
     }
-  }, [layers, riskZones, roadCorridors, fieldReports, infrastructure, selectedZone]);
+
+    // 5. ACTIVE ROUTE / DETOUR OVERLAYS
+    if (activeRoutePlan) {
+      // 5a. Primary blocked path (dashed rose/red line)
+      if (activeRoutePlan.primaryRoute?.path && activeRoutePlan.primaryRoute.path.length > 1) {
+        const primCoords = activeRoutePlan.primaryRoute.path.map((p: any) => [p.lat, p.lng] as [number, number]);
+        const primLine = L.polyline(primCoords, {
+          color: '#EF4444',
+          weight: 4.5,
+          dashArray: '6, 8',
+          opacity: 0.85,
+          interactive: true,
+        });
+        primLine.bindTooltip(
+          `<div class="font-sans px-2 py-1 text-xs">
+            <div class="font-bold text-rose-700">${activeRoutePlan.primaryRoute.name || 'Primary Corridor'} (IMPASSABLE)</div>
+            <div class="text-slate-600 text-[11px]">${activeRoutePlan.primaryRoute.distanceKm} km · Blocked at Km 44</div>
+          </div>`,
+          { sticky: true, className: 'pravaah-map-tooltip' }
+        );
+        primLine.addTo(group);
+      }
+
+      // 5b. Alternative detour path (solid emerald green line with outer glow)
+      if (activeRoutePlan.alternativeRoute?.path && activeRoutePlan.alternativeRoute.path.length > 1) {
+        const altCoords = activeRoutePlan.alternativeRoute.path.map((p: any) => [p.lat, p.lng] as [number, number]);
+
+        // Glow
+        const glowLine = L.polyline(altCoords, {
+          color: '#10B981',
+          weight: 9,
+          opacity: 0.35,
+          interactive: false,
+        });
+        glowLine.addTo(group);
+
+        // Solid core
+        const detourLine = L.polyline(altCoords, {
+          color: '#059669',
+          weight: 5,
+          opacity: 0.95,
+          interactive: true,
+        });
+        detourLine.bindTooltip(
+          `<div class="font-sans px-2 py-1 text-xs">
+            <div class="font-bold text-emerald-700">${activeRoutePlan.alternativeRoute.name || 'Safe Detour Corridor'}</div>
+            <div class="text-slate-600 text-[11px]">${activeRoutePlan.alternativeRoute.distanceKm} km · Active Safe Bypass (+${activeRoutePlan.alternativeRoute.distanceDeltaKm || 43} km)</div>
+          </div>`,
+          { sticky: true, className: 'pravaah-map-tooltip' }
+        );
+        detourLine.addTo(group);
+
+        // Waypoint markers along detour
+        activeRoutePlan.alternativeRoute.path.forEach((pt: any, idx: number) => {
+          if (idx === 0 || idx === activeRoutePlan.alternativeRoute.path.length - 1) return;
+          const wpIcon = L.divIcon({
+            className: 'custom-div-icon',
+            html: `
+              <div class="w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white shadow-sm flex items-center justify-center">
+                <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
+              </div>
+            `,
+            iconSize: [14, 14],
+            iconAnchor: [7, 7],
+          });
+          L.marker([pt.lat, pt.lng], { icon: wpIcon, interactive: false }).addTo(group);
+        });
+
+        // Fit map bounds to encompass the full alternative corridor
+        if (mapInstanceRef.current && altCoords.length > 0) {
+          mapInstanceRef.current.fitBounds(altCoords, { padding: [80, 80], maxZoom: 12 });
+        }
+      }
+    }
+  }, [layers, riskZones, roadCorridors, fieldReports, infrastructure, selectedZone, activeRoutePlan]);
 
   return <div ref={containerRef} className="absolute inset-0 w-full h-full" />;
 }

@@ -38,6 +38,7 @@ export interface MapProps {
   onZoomOutRef?: (fn: () => void) => void;
   onRecenterRef?: (fn: () => void) => void;
   mapRefCallback?: (mapInstance: any) => void;
+  activeRoutePlan?: any;
 }
 
 export function Map(props: MapProps) {
