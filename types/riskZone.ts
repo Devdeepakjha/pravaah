@@ -80,6 +80,8 @@ export interface RiskZone {
   updatedAt: string;
   modelVersion?: string;
   riskStatement?: string;
+  dataFreshness?: string;
+  warningLevel?: string;
   mlPrediction?: MLPredictionDetail;
 }
 

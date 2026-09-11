@@ -127,27 +127,38 @@ export default function LeafletMapContainer({
       mapInstanceRef.current.removeLayer(tileLayerRef.current);
     }
 
-    let url = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+    let url = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}';
     let maxZoom = 19;
+    let attribution = 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS';
 
     if (basemap === 'terrain') {
       // High-resolution world topographic relief & contours (reliable GIS standard)
       url = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}';
       maxZoom = 18;
+      attribution = 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, USGS';
     } else if (basemap === 'satellite') {
       // High-resolution world satellite imagery
       url = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
       maxZoom = 18;
+      attribution = 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN';
     } else {
-      // CartoDB Positron / Voyager - pristine light GIS basemap
-      url = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-      maxZoom = 19;
+      // Clean, zero-watermark Street GIS basemap
+      url = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}';
+      maxZoom = 18;
     }
 
     const tileLayer = L.tileLayer(url, {
       maxZoom,
+      attribution,
       subdomains: 'abc',
     }).addTo(mapInstanceRef.current);
+
+    // Auto-fallback to OpenStreetMap if tile server experiences network failure
+    tileLayer.on('tileerror', () => {
+      if (tileLayerRef.current && mapInstanceRef.current) {
+        tileLayerRef.current.setUrl('https://tile.openstreetmap.org/{z}/{x}/{y}.png');
+      }
+    });
 
     tileLayerRef.current = tileLayer;
   }, [basemap]);

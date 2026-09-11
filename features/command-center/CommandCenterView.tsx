@@ -257,6 +257,7 @@ export function CommandCenterView() {
           onOpenAlerts={() => setIsAlertsOpen(true)}
           onSelectLocation={handleSelectLocation}
           onOpenCitizenMode={() => setIsCitizenModeOpen(true)}
+          onOpenSettings={() => setIsSettingsOpen(true)}
         />
       )}
 

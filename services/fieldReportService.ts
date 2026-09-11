@@ -7,7 +7,33 @@ export async function getFieldReports(): Promise<FieldReport[]> {
   return result.data;
 }
 
-export async function submitFieldReport(formData: FormData): Promise<FieldReport> {
+export async function submitFieldReport(input: FormData | Record<string, any>): Promise<FieldReport> {
+  let formData: FormData;
+  if (input instanceof FormData) {
+    formData = input;
+  } else {
+    formData = new FormData();
+    Object.entries(input).forEach(([key, val]) => {
+      if (val !== undefined && val !== null) {
+        if (key === 'file' && val instanceof File) {
+          formData.append('image', val);
+        } else if (key === 'incidentType') {
+          formData.append('incident_type', String(val));
+        } else if (key === 'locationName') {
+          formData.append('location_name', String(val));
+        } else if (key === 'reporterName') {
+          formData.append('reporter_name', String(val));
+        } else if (key === 'reporterRole') {
+          formData.append('reporter_role', String(val));
+        } else if (key === 'reporterAgency') {
+          formData.append('reporter_agency', String(val));
+        } else {
+          formData.append(key, String(val));
+        }
+      }
+    });
+  }
+
   if (IS_LIVE_API_ENABLED) {
     try {
       const res = await fetch(`${API_BASE_URL}/api/v1/field-reports`, {

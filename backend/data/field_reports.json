@@ -1,5 +1,48 @@
 [
   {
+    "id": "report-cd0284a0",
+    "title": "PyTest Automated Tension Crack Observation",
+    "incidentType": "TENSION_CRACK",
+    "locationName": "Dikchu Km 18",
+    "district": "Gangtok",
+    "state": "Sikkim",
+    "coordinates": {
+      "lat": 27.38,
+      "lng": 88.59
+    },
+    "reporter": {
+      "name": "Test Geologist",
+      "role": "QA Engineer",
+      "agency": "PRAVAAH Automated Test Suite"
+    },
+    "status": "VERIFIED_AI_SCREENED",
+    "urgency": "HIGH",
+    "severity": "HIGH",
+    "timestamp": "2026-09-11T09:04:33.842899+00:00",
+    "observations": "Fresh transverse crack 12mm wide expanding across the roadway scarp.",
+    "affectedCorridor": "Local Highway/Link Road",
+    "aiAnalysis": {
+      "severity": "HIGH",
+      "operational_priority_influence": "P1",
+      "confidence": 0.85,
+      "evidence": [
+        "Extensive exposed bedrock/soil (100.0% bare surface) indicative of fresh scarp or slope scar",
+        "Observer reported ground tension cracks (corroborates edge detection)"
+      ],
+      "metrics": {
+        "soil_exposure_pct": 100.0,
+        "vegetation_pct": 0.0,
+        "edge_fracture_density": 0.0,
+        "texture_roughness_variance": 0.0,
+        "moisture_saturation_pct": 0.0
+      },
+      "analysis_source": "PRAVAAH Computer Vision Engine v1.0 (Colorimetry & Edge Discontinuity Analysis)",
+      "disclaimer": "AI-assisted visual assessment (preliminary screening, not confirmed geological survey)."
+    },
+    "imageUrl": "/uploads/field_images/report-cd0284a0.png",
+    "dataSource": "COMMUNITY_REPORT"
+  },
+  {
     "id": "report-f571f0f4",
     "title": "PyTest Automated Tension Crack Observation",
     "incidentType": "TENSION_CRACK",

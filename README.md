@@ -1,39 +1,60 @@
-# PRAVAAH (प्रवाह) — Landslide Intelligence & Disaster Response Platform
+# PRAVAAH (प्रवाह) — AI Landslide Risk Intelligence & Disaster Response Platform
 
 [![Build Status](https://img.shields.io/badge/Frontend-Next.js%2014-black?logo=next.js)](https://nextjs.org)
 [![Backend Status](https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi)](https://fastapi.tiangolo.com)
 [![ML Engine](https://img.shields.io/badge/ML%20Engine-XGBoost%20v2.0-orange?logo=xgboost)](https://xgboost.readthedocs.io)
 [![Model AUC](https://img.shields.io/badge/Spatial%20Holdout%20AUC-0.933-brightgreen)](#machine-learning-architecture)
 [![Test Suite](https://img.shields.io/badge/PyTest-11%20Passed-success)](#verification--testing)
+[![SIH 2026](https://img.shields.io/badge/SIH%202026-Problem%20SIH260001%20%7C%20MDoNER-blue)](#smart-india-hackathon-2026-context)
 
-> **A scientifically grounded, operational landslide intelligence platform for Northeast India (Sikkim, Assam, Arunachal Pradesh, Mizoram).**
+> **"See the risk before the road disappears."**
 > 
-> *Bridging geospatial machine learning, live meteorology, computer-vision field evidence, and automated emergency transit routing.*
+> A scientifically grounded, operational landslide intelligence and early warning platform engineered for the **North Eastern Region of India (Sikkim, Assam, Arunachal Pradesh, Mizoram)**.
+> 
+> Developed for **Smart India Hackathon 2026 — Problem Statement SIH260001**:  
+> *"AI-Based early warning and landslide Risk Monitoring System in NER"*  
+> **Ministry of Development of North Eastern Region (MDoNER)**
 
 ---
 
-## 🧭 The PRAVAAH Narrative Walkthrough
+## 🧭 Multi-Page Platform Architecture
 
-PRAVAAH delivers an intuitive, complete operational loop designed for both civil defense command centers and ground citizens:
+PRAVAAH provides a unified, role-aware experience tailored for administrators, field personnel, and residents alike across 6 dedicated routes:
 
-```
-[ Open PRAVAAH ] ──> [ See Actual Risk ] ──> [ Understand Why (SHAP) ] 
-        │
-        ├──> [ Change Rainfall (What-If) ] ──> [ See Instant Delta ]
-        │
-        ├──> [ Submit Field Evidence ] ──> [ Computer Vision Screening ] ──> [ P1/P2/P3 Response Priority ]
-        │
-        └──> [ Identify Blockade (NH-10 Km 44) ] ──> [ Dijkstra Safe Detour (NH-717A Reshi Bypass) ]
-```
+| Route | View | Description & Primary Features | Target Role |
+|---|---|---|---|
+| **`/`** | **Public Landing** | Cinematic terrain aesthetic, problem breakdown, animated pipeline flow diagram, 4 capability highlights, credibility strip, and instant role selection modal. | *Public / Evaluators* |
+| **`/command-center`** | **GIS Command Center** | Full-bleed GIS map with Esri Topo/Satellite/Streets, real-time risk polygons, SHAP factor breakdown drawer, live alert ticker, and scenario toolbar. | *🏛️ Disaster Management* |
+| **`/citizen`** | **Citizen Safety Portal** | Mobile-first community view with automatic geolocation detection, 5-tier color status, plain-language "Why", safety checklists, and district emergency helplines. | *👥 Citizen / Traveler* |
+| **`/field-intelligence`** | **Field Evidence Center** | Photo upload with transparent computer vision screening (soil colorimetry, edge discontinuity, debris score), offline `localStorage` queue, and sync indicator. | *📷 Field Officer* |
+| **`/response`** | **Incident Response** | Multi-criteria incident prioritization matrix (`P1 / P2 / P3`), lifeline corridor monitoring, and Dijkstra-based safe highway detour calculation (NH-717A bypass). | *🏛️ Disaster Management* |
+| **`/forecast`** | **Simulation Sandbox** | What-If rainfall surge simulator with preset buttons (`+20%`, `+40%`, `+60%`, `+100%`), continuous slider, and instant before/after sector risk comparison cards. | *🔬 Analyst / Planner* |
 
-1. **See Actual Risk**: Open PRAVAAH to view real-time geospatial risk polygons evaluated dynamically via XGBoost using live rainfall and real DEM terrain features.
-2. **Understand Why**: Click any sector to open the drawer revealing SHAP feature contributions (e.g. 72h antecedent rainfall, slope gradient, curvature) and environmental telemetry.
-3. **Change Rainfall (What-If Hero Feature)**: Adjust the rainfall slider or click presets (`+20%`, `+40%`, `+60%`, `+100%`, `Reset`) to run instantaneous simulation and see risk change with delta indicators.
-4. **Submit Field Evidence**: Citizens or field officers upload slope photos from the mobile drawer or modal. The transparent computer-vision screener analyzes surface colorimetry, edge discontinuity, and debris texture.
-5. **Elevate Response Priority**: Verified field reports feed into the multi-criteria incident response matrix (`P1 / P2 / P3`), ranking operations by combined risk, population exposure, and critical lifelines.
-6. **Find an Alternative Route**: In the event of highway failure (e.g., NH-10 blocked at Km 44), Dijkstra graph search detects the choke point and computes the safest active bypass corridor (NH-717A Reshi-Algarah bypass: +43 km, +80 mins) rendered directly on the GIS map.
-7. **Citizen Mode**: One-click switch to a plain-language community view with safety checklists, district emergency helplines, and zero-jargon risk statuses.
-8. **Multi-Channel Alerts**: Broadcast preview generator outputting Common Alerting Protocol (CAP XML), SMS broadcast strings (< 160 characters), and WhatsApp advisory bulletins.
+### 1-Click Role Switcher
+Users can seamlessly pivot between perspectives at any point using the prominent **Role Switcher Dropdown** in the universal header:
+- **🏛️ Disaster Management**: Navigates to `/command-center` with full operational controls.
+- **📷 Field Officer**: Navigates to `/field-intelligence` for ground reconnaissance and evidence submission.
+- **👥 Citizen**: Navigates to `/citizen` for localized warnings, emergency helplines, and zero-jargon guidance.
+
+---
+
+## 🗺️ Zero-Watermark GIS Tile Architecture
+
+PRAVAAH features a bulletproof GIS basemap engine that requires **no proprietary API keys** and renders **zero evaluation watermarks**:
+
+1. **Topographic (Default)**: Esri World Topo Map (`https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}`)
+2. **Satellite Imagery**: Esri World Imagery (`https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}`)
+3. **Street Map**: Esri World Street Map (`https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}`)
+4. **Resilient Fallback**: Automatic failover to OpenStreetMap tiles (`https://tile.openstreetmap.org/{z}/{x}/{y}.png`) if tile servers encounter network rate-limiting.
+
+---
+
+## 📶 Offline-First Field Evidence Queue
+
+Field officers operating in mountainous gorges often lose mobile connectivity. PRAVAAH includes an offline sync engine:
+- When network connectivity is absent or the FastAPI backend is unreachable, submitted photo reports are automatically serialized to browser `localStorage`.
+- The interface displays an active offline counter badge: `⚠️ X offline reports queued`.
+- Once reconnected, a single click on **"Sync Now"** flushes the pending queue directly to the server with zero data loss.
 
 ---
 
@@ -41,13 +62,14 @@ PRAVAAH delivers an intuitive, complete operational loop designed for both civil
 
 ```mermaid
 flowchart TB
-    subgraph Frontend ["Frontend (Next.js 14 + React + Tailwind + Leaflet/Google GIS)"]
-        CCV["Command Center View"]
-        GIS["Full-Bleed GIS Engine (Leaflet)"]
-        ZD["Contextual Zone Drawer & What-If Slider"]
-        CV["Citizen Plain-Language View"]
-        RP["Incident Response Prioritization"]
-        FR["Field Evidence Upload Modal"]
+    subgraph Frontend ["Frontend (Next.js 14 + React + Tailwind + Esri/OSM GIS)"]
+        Landing["/ (Cinematic Landing)"]
+        CCV["/command-center (GIS Command Center)"]
+        CitizenView["/citizen (Mobile Safety Portal)"]
+        FieldView["/field-intelligence (Evidence Center + Offline Sync)"]
+        ResponseView["/response (Incident Ranking & Safe Bypass)"]
+        ForecastView["/forecast (What-If Rainfall Simulator)"]
+        Header["Universal Header with 1-Click Role Switcher & Truth Badge"]
     end
 
     subgraph Backend ["Backend (FastAPI Engine @ localhost:8000)"]
@@ -55,7 +77,7 @@ flowchart TB
         MLInference["ML Inference Engine (XGBoost + TreeSHAP)"]
         WeatherService["Weather Provider (Live IMD / Calibrated Demo Replay)"]
         FieldVision["Transparent Computer Vision Screener (OpenCV / PIL)"]
-        RoutingEngine["Highway Graph & Dijkstra Solver"]
+        RoutingEngine["Highway Graph & Dijkstra Detour Solver"]
         AlertEngine["CAP / SMS Multi-channel Formatter"]
     end
 
@@ -64,13 +86,24 @@ flowchart TB
         ObservationalData["461 Curated Observations (ISRO + DEM + Rainfall)"]
         FieldReportsJSON["backend/data/field_reports.json"]
         UploadsDir["backend/uploads/field_images/"]
+        LocalStorage["Client Browser LocalStorage (Offline Queue)"]
     end
 
-    GIS <--> CCV
+    Landing --> CCV
+    Landing --> CitizenView
+    Landing --> FieldView
+    Header <--> CCV
+    Header <--> CitizenView
+    Header <--> FieldView
+    Header <--> ResponseView
+    Header <--> ForecastView
+
     CCV <--> APIRouter
-    ZD <--> APIRouter
-    RP <--> APIRouter
-    FR <--> APIRouter
+    CitizenView <--> APIRouter
+    FieldView <--> APIRouter
+    FieldView <--> LocalStorage
+    ResponseView <--> APIRouter
+    ForecastView <--> APIRouter
 
     APIRouter --> MLInference
     APIRouter --> WeatherService
@@ -88,7 +121,7 @@ flowchart TB
 
 ## 🔬 Scientific ML Foundation
 
-PRAVAAH is powered by scientifically verified observational data rather than synthetic distributions:
+PRAVAAH is powered by verified observational data rather than synthetic distributions:
 
 - **Observational Dataset**: 461 real spatial-temporal records across Northeast India combining verified landslide positive events (ISRO/NRSC Landslide Atlas, GSI Bhusanket) with geographically stratified non-event observations sampled during historical dry/monsoon periods.
 - **Model Evaluation**: Evaluated under spatial holdout cross-validation to prevent geographic leakage:
@@ -130,7 +163,7 @@ pip install -r backend/requirements.txt
 # Launch FastAPI server on port 8000
 python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
 ```
-API Documentation will be live at: `http://127.0.0.1:8000/docs`
+API Documentation is accessible at: `http://127.0.0.1:8000/docs`
 
 ### 4. Start the Frontend (Next.js)
 ```bash
@@ -167,6 +200,12 @@ pytest backend/tests/test_api.py -v
 | `test_10_invalid_inputs_and_errors` | Robust 404/422/400 validation error handling | **PASSED** |
 | `test_11_weather_resilience_fallback` | Resilient fallback to calibrated historical replay | **PASSED** |
 
+### Frontend Build Verification
+```bash
+npm run build
+```
+- Fully passes static generation across all 6 routes (`/`, `/command-center`, `/citizen`, `/field-intelligence`, `/response`, `/forecast`) with code 0.
+
 ---
 
 ## 🛡️ Scientific & Operational Disclaimers
@@ -174,6 +213,7 @@ pytest backend/tests/test_api.py -v
 1. **Probabilistic Risk Statements**: Model outputs represent calibrated statistical landslide probabilities based on historical patterns and current rainfall. They are not deterministic guarantees of immediate slope failure.
 2. **Computer Vision Screening**: The field evidence photo analysis tool provides preliminary visual screening (edge discontinuity, soil colorimetry, and debris coverage) to expedite response prioritization; it is **not** a substitute for certified on-site geotechnical boreholes or certified engineering surveys.
 3. **Highway Status**: Road status and detour suggestions are verified against current Border Roads Organisation (BRO) and regional police bulletins.
+4. **Data Provenance**: The platform transparently displays whether incoming telemetry is sourced from live IMD stations, cached data, or calibrated historical replay scenarios.
 
 ---
 

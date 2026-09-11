@@ -64,3 +64,17 @@ export async function runRainfallSimulation(
 
   return fallbackResult;
 }
+
+export async function simulateScenario(params: {
+  zone_id: string;
+  rainfall_delta_percent: number;
+  scenario_type?: string;
+}): Promise<ScenarioResult> {
+  const dummyZone = {
+    id: params.zone_id,
+    riskScore: 68,
+    impact: { populationExposed: 18450 }
+  } as RiskZone;
+  return runRainfallSimulation(dummyZone, params.rainfall_delta_percent);
+}
+
