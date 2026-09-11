@@ -23,3 +23,9 @@ CORS_ORIGINS = [
 ]
 
 API_V1_PREFIX = "/api/v1"
+
+# Weather Provider Configuration
+IMD_API_KEY = os.getenv("IMD_API_KEY", "")
+IMD_BASE_URL = os.getenv("IMD_BASE_URL", "https://api.imd.gov.in")
+WEATHER_CACHE_TTL_SECONDS = int(os.getenv("WEATHER_CACHE_TTL_SECONDS", "600"))
+WEATHER_PROVIDER_PREFERENCE = os.getenv("WEATHER_PROVIDER_PREFERENCE", "auto") # auto, imd, demo

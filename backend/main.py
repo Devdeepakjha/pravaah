@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.config import CORS_ORIGINS
 from backend.routes.predict import router as predict_router
 from backend.routes.risk_zones import router as risk_zones_router
+from backend.routes.weather import router as weather_router
 
 app = FastAPI(
     title="PRAVAAH Landslide Intelligence ML API",
@@ -26,6 +27,7 @@ app.add_middleware(
 
 app.include_router(predict_router)
 app.include_router(risk_zones_router)
+app.include_router(weather_router)
 
 
 @app.get("/health")
