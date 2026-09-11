@@ -17,6 +17,14 @@
 
 ---
 
+## 🚀 Live Demo
+
+**🌐 Live Application:** https://pravaah-navy.vercel.app/
+
+**⚙️ Backend API:** https://pravaah-api.onrender.com/
+
+---
+
 ## 🧭 Multi-Page Platform Architecture
 
 PRAVAAH provides a unified, role-aware experience tailored for administrators, field personnel, and residents alike across 6 dedicated routes:
