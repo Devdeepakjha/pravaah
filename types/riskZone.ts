@@ -78,6 +78,8 @@ export interface RiskZone {
   telemetry: ZoneTelemetry;
   dataSource: DataSource;
   updatedAt: string;
+  modelVersion?: string;
+  riskStatement?: string;
   mlPrediction?: MLPredictionDetail;
 }
 
