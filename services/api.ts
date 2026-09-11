@@ -5,7 +5,7 @@
  * and the future FastAPI backend (set via NEXT_PUBLIC_API_URL).
  */
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? '';
 export const IS_LIVE_API_ENABLED = process.env.NEXT_PUBLIC_DISABLE_LIVE_API !== 'true';
 
 export async function fetchWithFallback<T>(
