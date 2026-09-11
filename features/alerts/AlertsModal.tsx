@@ -38,9 +38,16 @@ export function AlertsModal({ isOpen, onClose, alerts, onSelectAlert }: AlertsMo
         </div>
 
         {/* Alerts List */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        <div className="flex-1 overflow-y-auto custom-scroll p-4 space-y-3">
+          {/* Notification Preview Testing Card */}
+          <AlertPreviewSection />
+
+          <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider pt-1">
+            Active Regional Bulletins
+          </div>
+
           {alerts.map((alert) => {
-            const colorMeta = RISK_COLORS[alert.severity];
+            const colorMeta = RISK_COLORS[alert.severity] || RISK_COLORS['HIGH'];
             return (
               <div
                 key={alert.id}
@@ -54,11 +61,11 @@ export function AlertsModal({ isOpen, onClose, alerts, onSelectAlert }: AlertsMo
                   <span
                     className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border ${colorMeta.badgeClass}`}
                   >
-                    {alert.severity} · {alert.code}
+                    {alert.severity} · {alert.code || 'ALERT'}
                   </span>
                   <div className="flex items-center gap-1 text-[11px] text-slate-400">
                     <Clock className="w-3 h-3" />
-                    <span>{alert.issuedAt}</span>
+                    <span>{alert.issuedAt || 'Active'}</span>
                   </div>
                 </div>
 
@@ -68,11 +75,11 @@ export function AlertsModal({ isOpen, onClose, alerts, onSelectAlert }: AlertsMo
                 </div>
 
                 <p className="text-slate-600 text-xs leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                  {alert.recommendedAction}
+                  {alert.recommendedAction || alert.actionMandate}
                 </p>
 
                 <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1">
-                  <span>{alert.issuingAuthority}</span>
+                  <span>{alert.issuingAuthority || 'State Disaster Management Authority'}</span>
                   <span className="text-slate-800 font-medium flex items-center gap-0.5">
                     Focus on map <ChevronRight className="w-3 h-3" />
                   </span>
@@ -82,6 +89,93 @@ export function AlertsModal({ isOpen, onClose, alerts, onSelectAlert }: AlertsMo
           })}
         </div>
       </div>
+    </div>
+  );
+}
+
+function AlertPreviewSection() {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [channel, setChannel] = React.useState<'sms' | 'web'>('sms');
+  const [previewData, setPreviewData] = React.useState<any>(null);
+  const [loading, setLoading] = React.useState(false);
+
+  const handleFetchPreview = async () => {
+    setLoading(true);
+    try {
+      const { previewAlert } = await import('@/services/alertService');
+      const data = await previewAlert('zone-east-sikkim', channel);
+      setPreviewData(data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="p-3 bg-slate-900 text-white rounded-xl space-y-2.5 border border-slate-800 text-xs">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1.5 font-bold text-sky-400 text-[11px]">
+          <BellRing className="w-3.5 h-3.5" />
+          <span>Broadcast Notification Engine Preview</span>
+        </div>
+        <button
+          onClick={() => {
+            setIsOpen(!isOpen);
+            if (!isOpen && !previewData) handleFetchPreview();
+          }}
+          className="text-[10px] text-sky-300 hover:text-white underline cursor-pointer"
+        >
+          {isOpen ? 'Hide Test Panel' : 'Test Alert Preview'}
+        </button>
+      </div>
+
+      {isOpen && (
+        <div className="space-y-2 pt-1 border-t border-slate-800 animate-in fade-in duration-150">
+          <div className="flex items-center justify-between text-[11px]">
+            <span className="text-slate-400">Target Channel:</span>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => {
+                  setChannel('sms');
+                  handleFetchPreview();
+                }}
+                className={`px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer ${
+                  channel === 'sms' ? 'bg-sky-500 text-white' : 'bg-slate-800 text-slate-400'
+                }`}
+              >
+                SMS Broadcast
+              </button>
+              <button
+                onClick={() => {
+                  setChannel('web');
+                  handleFetchPreview();
+                }}
+                className={`px-2 py-0.5 rounded text-[10px] font-bold cursor-pointer ${
+                  channel === 'web' ? 'bg-sky-500 text-white' : 'bg-slate-800 text-slate-400'
+                }`}
+              >
+                Web Push
+              </button>
+            </div>
+          </div>
+
+          {loading ? (
+            <div className="py-3 text-center text-slate-400 text-[11px]">Generating CAP notification payload...</div>
+          ) : previewData ? (
+            <div className="p-2.5 bg-slate-950 rounded-lg border border-slate-800 space-y-1.5 font-mono text-[10px]">
+              <div className="flex justify-between text-slate-400 border-b border-slate-900 pb-1">
+                <span>Sender: {previewData.payload?.sender_id || 'NDMA-PRAVAH'}</span>
+                <span className="text-amber-400">{previewData.carrier_status}</span>
+              </div>
+              <div className="text-slate-200 leading-relaxed font-sans text-[11px]">
+                {previewData.payload?.message_body || previewData.payload?.body}
+              </div>
+              <div className="text-[9px] text-slate-500 italic pt-0.5">
+                {previewData.disclaimer}
+              </div>
+            </div>
+          ) : null}
+        </div>
+      )}
     </div>
   );
 }

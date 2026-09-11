@@ -11,6 +11,9 @@ export interface Alert {
   issuingAuthority: string; // e.g. "State Disaster Management Authority (SSDMA)"
   summary: string;
   recommendedAction: string;
+  actionMandate?: string;
+  message?: string;
+  channels?: string[];
   isBroadcasting: boolean;
   dataSource: DataSource;
 }
