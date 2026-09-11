@@ -17,8 +17,7 @@ import {
   Camera,
   Activity,
   Sliders,
-  Compass,
-  Settings
+  Compass
 } from 'lucide-react';
 import { RiskZone } from '@/types/riskZone';
 import { searchLocations } from '@/services/riskZoneService';
@@ -362,17 +361,6 @@ export function Header({
           <Bell className="w-4 h-4" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
         </button>
-
-        {/* Settings button */}
-        {onOpenSettings && (
-          <button
-            onClick={onOpenSettings}
-            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-600 transition-colors cursor-pointer"
-            title="System Status & GIS Settings"
-          >
-            <Settings className="w-4 h-4" />
-          </button>
-        )}
 
         {/* Language selector */}
         <button
