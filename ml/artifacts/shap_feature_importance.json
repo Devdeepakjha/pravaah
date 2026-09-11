@@ -1,14 +1,14 @@
 {
-  "slope": 1.9008,
-  "rain_7d": 1.858,
-  "terrain_ruggedness": 0.7325,
-  "historical_landslide_density": 0.1392,
-  "curvature": 0.0497,
-  "aspect_cos": 0.0486,
-  "elevation": 0.037,
-  "rain_72h": 0.0226,
+  "rain_7d": 1.505,
+  "curvature": 1.4368,
+  "aspect_cos": 0.7193,
+  "terrain_ruggedness": 0.6639,
+  "rain_24h": 0.3043,
+  "rain_72h": 0.1996,
+  "slope": 0.1732,
+  "rainfall_intensity": 0.1037,
+  "elevation": 0.0487,
+  "historical_landslide_density": 0.0362,
   "aspect_sin": 0.0,
-  "landcover": 0.0,
-  "rain_24h": 0.0,
-  "rainfall_intensity": 0.0
+  "landcover": 0.0
 }

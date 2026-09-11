@@ -1,0 +1,11 @@
+{
+  "train_region": "Sikkim (Gangtok / Teesta)",
+  "test_region": "Mizoram (Aizawl Sector)",
+  "train_samples": 443,
+  "test_samples": 18,
+  "Precision": 0.0,
+  "Recall": 0.0,
+  "F1": 0.0,
+  "ROC-AUC": NaN,
+  "PR-AUC": 1.0
+}

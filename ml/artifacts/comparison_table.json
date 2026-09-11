@@ -1,41 +1,41 @@
 {
   "Logistic Regression": {
-    "Precision": 1.0,
-    "Recall": 0.8125,
-    "F1": 0.8966,
-    "ROC-AUC": 1.0,
-    "PR-AUC": 1.0,
+    "Precision": 0.875,
+    "Recall": 0.4667,
+    "F1": 0.6087,
+    "ROC-AUC": 0.8944,
+    "PR-AUC": 0.8063,
     "Confusion_Matrix": {
-      "True_Negative": 57,
-      "False_Positive": 0,
-      "False_Negative": 3,
-      "True_Positive": 13
+      "True_Negative": 35,
+      "False_Positive": 1,
+      "False_Negative": 8,
+      "True_Positive": 7
     }
   },
   "Random Forest": {
-    "Precision": 1.0,
-    "Recall": 1.0,
-    "F1": 1.0,
-    "ROC-AUC": 1.0,
-    "PR-AUC": 1.0,
+    "Precision": 0.5,
+    "Recall": 0.2667,
+    "F1": 0.3478,
+    "ROC-AUC": 0.863,
+    "PR-AUC": 0.6716,
     "Confusion_Matrix": {
-      "True_Negative": 57,
-      "False_Positive": 0,
-      "False_Negative": 0,
-      "True_Positive": 16
+      "True_Negative": 32,
+      "False_Positive": 4,
+      "False_Negative": 11,
+      "True_Positive": 4
     }
   },
   "XGBoost": {
-    "Precision": 1.0,
-    "Recall": 1.0,
-    "F1": 1.0,
-    "ROC-AUC": 1.0,
-    "PR-AUC": 1.0,
+    "Precision": 0.6667,
+    "Recall": 0.1333,
+    "F1": 0.2222,
+    "ROC-AUC": 0.9333,
+    "PR-AUC": 0.7584,
     "Confusion_Matrix": {
-      "True_Negative": 57,
-      "False_Positive": 0,
-      "False_Negative": 0,
-      "True_Positive": 16
+      "True_Negative": 35,
+      "False_Positive": 1,
+      "False_Negative": 13,
+      "True_Positive": 2
     }
   }
 }

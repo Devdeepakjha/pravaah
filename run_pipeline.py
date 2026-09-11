@@ -20,6 +20,7 @@ if ROOT_DIR not in sys.path:
 from ml.data_ingestion.fetch_landslides import run as run_fetch_landslides
 from ml.data_ingestion.fetch_rainfall import enrich_landslides_with_rainfall
 from ml.preprocessing.build_dataset import build_dataset
+from ml.evaluation.leakage_checker import run_dataset_audit
 from ml.training.train_models import train_all_models
 from ml.evaluation.evaluate import evaluate_models
 from ml.inference.predict import LandslidePredictor
@@ -30,19 +31,22 @@ def main():
     print("PRAVAAH — SCIENTIFIC ML PIPELINE EXECUTION (MILESTONE A)")
     print("=" * 75)
 
-    print("\n[Step 1/5] Ingesting Real Landslide Inventories (Zenodo 8169506 & 20783995)...")
+    print("\n[Step 1/6] Ingesting Real Landslide Inventories (Zenodo 8169506 & 20783995)...")
     run_fetch_landslides()
 
-    print("\n[Step 2/5] Reconstructing Historical Antecedent Rainfall (P24h, P72h, P7d)...")
+    print("\n[Step 2/6] Reconstructing Historical Antecedent Rainfall (P24h, P72h, P7d)...")
     enrich_landslides_with_rainfall()
 
-    print("\n[Step 3/5] Constructing Controlled Negative Samples & Engineering Features...")
+    print("\n[Step 3/6] Constructing Observational Negative Samples & Engineering Features...")
     build_dataset(n_negative=250)
 
-    print("\n[Step 4/5] Training Baseline Models (LogReg, Random Forest, XGBoost)...")
+    print("\n[Step 4/6] Executing Scientific Dataset Quality & Leakage Audit...")
+    run_dataset_audit()
+
+    print("\n[Step 5/6] Training Baseline Models (LogReg, Random Forest, XGBoost)...")
     train_all_models()
 
-    print("\n[Step 5/5] Evaluating Models, Computing Metrics & Calculating SHAP Explanations...")
+    print("\n[Step 6/6] Evaluating Models, Computing Metrics & Calculating SHAP Explanations...")
     comparison, shap_imp = evaluate_models()
 
     print("\n[Verification] Running Sample Test Inference with SHAP...")

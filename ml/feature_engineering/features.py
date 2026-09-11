@@ -32,17 +32,24 @@ def haversine_km(lat1, lon1, lat2, lon2):
 
 
 def compute_historical_density(df: pd.DataFrame, radius_km: float = 5.0) -> list:
-    """Compute local historical landslide density (failures within radius_km)."""
-    pos_coords = df[df["landslide"] == 1][["latitude", "longitude"]].values
+    """
+    Compute strictly antecedent historical landslide density (failures within radius_km
+    occurring prior to the event date). Eliminates temporal lookahead leakage.
+    """
+    pos_df = df[df["landslide"] == 1][["latitude", "longitude", "event_date"]].copy()
+    pos_df["dt"] = pd.to_datetime(pos_df["event_date"], errors="coerce")
+
     densities = []
     for _, row in df.iterrows():
         lat, lon = row["latitude"], row["longitude"]
-        count = sum(1 for plat, plon in pos_coords if haversine_km(lat, lon, plat, plon) <= radius_km)
-        # If the sample itself is a positive sample, don't count itself
-        if row["landslide"] == 1:
-            count = max(0, count - 1)
+        cur_dt = pd.to_datetime(row["event_date"], errors="coerce")
+        # Only count events strictly before cur_dt
+        prior_pos = pos_df[pos_df["dt"] < cur_dt]
+        count = sum(1 for plat, plon in zip(prior_pos["latitude"].values, prior_pos["longitude"].values)
+                    if haversine_km(lat, lon, plat, plon) <= radius_km)
         densities.append(count)
     return densities
+
 
 
 def assign_landcover(row) -> int:

@@ -85,18 +85,18 @@ def train_all_models():
 
     # 3. XGBoost
     print("Training XGBoost Classifier...")
-    pos_weight = float((y_train == 0).sum()) / max(float(y_train.sum()), 1.0)
     xgb = XGBClassifier(
-        n_estimators=100,
+        n_estimators=120,
         max_depth=4,
         learning_rate=0.06,
         subsample=0.85,
         colsample_bytree=0.85,
-        scale_pos_weight=pos_weight,
+        scale_pos_weight=1.0,
         eval_metric="logloss",
         random_state=42
     )
     xgb.fit(
+
         X_train,
         y_train,
         eval_set=[(X_val, y_val)],

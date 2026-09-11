@@ -24,8 +24,8 @@
     "No Landslide",
     "Landslide Event"
   ],
-  "train_samples": 308,
-  "val_samples": 73,
-  "test_samples": 73,
+  "train_samples": 382,
+  "val_samples": 28,
+  "test_samples": 51,
   "created_at": "2026-09-11"
 }

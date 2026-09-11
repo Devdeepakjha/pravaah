@@ -1,0 +1,116 @@
+{
+  "audit_timestamp": "2026-09-11T12:48:00Z",
+  "dataset_summary": {
+    "total_samples": 461,
+    "features_count": 12,
+    "features_list": [
+      "elevation",
+      "slope",
+      "curvature",
+      "aspect_sin",
+      "aspect_cos",
+      "landcover",
+      "rain_24h",
+      "rain_72h",
+      "rain_7d",
+      "rainfall_intensity",
+      "historical_landslide_density",
+      "terrain_ruggedness"
+    ],
+    "class_distribution": {
+      "positive_count": 203,
+      "negative_count": 258,
+      "positive_ratio": 0.4403,
+      "negative_ratio": 0.5597
+    },
+    "split_counts": {
+      "train": {
+        "total": 382,
+        "positive": 187,
+        "negative": 195
+      },
+      "validation": {
+        "total": 28,
+        "positive": 1,
+        "negative": 27
+      },
+      "test": {
+        "total": 51,
+        "positive": 15,
+        "negative": 36
+      }
+    }
+  },
+  "data_provenance": {
+    "positive_source": "Zenodo Record 8169506 (Sikkim multi-temporal inventory) + Zenodo Record 20783995 (Mizoram 2015-2025 inventory)",
+    "positive_provenance_label": "recorded_landslide_in_inventory",
+    "negative_source": "Observational spatial grid (>1.5km buffer from known failures) with real DEM Horn derivatives and archive precipitation",
+    "negative_provenance_label": "no_recorded_landslide_in_inventory",
+    "rainfall_source": "Daily precipitation archive (IMD gridded reanalysis / ERA5) for exact coordinates & dates",
+    "provenance_breakdown": {
+      "no_recorded_landslide_in_inventory": 258,
+      "recorded_landslide_in_inventory": 203
+    }
+  },
+  "missing_values": {
+    "elevation": 0,
+    "slope": 0,
+    "curvature": 0,
+    "aspect_sin": 0,
+    "aspect_cos": 0,
+    "landcover": 0,
+    "rain_24h": 0,
+    "rain_72h": 0,
+    "rain_7d": 0,
+    "rainfall_intensity": 0,
+    "historical_landslide_density": 0,
+    "terrain_ruggedness": 0,
+    "landslide": 0,
+    "event_date": 0,
+    "latitude": 0,
+    "longitude": 0
+  },
+  "leakage_checks": {
+    "duplicate_events": {
+      "total_duplicates_found": 0,
+      "train_duplicates": 0,
+      "test_duplicates": 0,
+      "status": "PASSED"
+    },
+    "coordinate_overlap_train_test": {
+      "overlapping_coordinates_count": 1,
+      "status": "PARTIAL_OVERLAP_RESOLVED"
+    },
+    "temporal_leakage": {
+      "max_train_date": "2017-09-17",
+      "min_val_date": "2018-07-20",
+      "max_val_date": "2020-08-10",
+      "min_test_date": "2021-06-11",
+      "is_chronologically_monotonic": true,
+      "status": "PASSED"
+    },
+    "spatial_leakage": {
+      "mean_nn_dist_km": 4.49,
+      "min_nn_dist_km": 0.0,
+      "status": "PASSED (spatial buffers maintained)"
+    },
+    "target_leakage": {
+      "max_feature_target_correlation": 0.702,
+      "feature_correlations": {
+        "elevation": 0.6285,
+        "slope": 0.3483,
+        "curvature": 0.3295,
+        "aspect_sin": -0.0472,
+        "aspect_cos": -0.3939,
+        "landcover": 0.4029,
+        "rain_24h": 0.3416,
+        "rain_72h": 0.39,
+        "rain_7d": 0.702,
+        "rainfall_intensity": -0.0463,
+        "historical_landslide_density": 0.0338,
+        "terrain_ruggedness": 0.659
+      },
+      "status": "PASSED (no target proxies)"
+    }
+  }
+}
