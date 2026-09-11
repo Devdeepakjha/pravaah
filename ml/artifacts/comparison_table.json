@@ -1,0 +1,41 @@
+{
+  "Logistic Regression": {
+    "Precision": 1.0,
+    "Recall": 0.8125,
+    "F1": 0.8966,
+    "ROC-AUC": 1.0,
+    "PR-AUC": 1.0,
+    "Confusion_Matrix": {
+      "True_Negative": 57,
+      "False_Positive": 0,
+      "False_Negative": 3,
+      "True_Positive": 13
+    }
+  },
+  "Random Forest": {
+    "Precision": 1.0,
+    "Recall": 1.0,
+    "F1": 1.0,
+    "ROC-AUC": 1.0,
+    "PR-AUC": 1.0,
+    "Confusion_Matrix": {
+      "True_Negative": 57,
+      "False_Positive": 0,
+      "False_Negative": 0,
+      "True_Positive": 16
+    }
+  },
+  "XGBoost": {
+    "Precision": 1.0,
+    "Recall": 1.0,
+    "F1": 1.0,
+    "ROC-AUC": 1.0,
+    "PR-AUC": 1.0,
+    "Confusion_Matrix": {
+      "True_Negative": 57,
+      "False_Positive": 0,
+      "False_Negative": 0,
+      "True_Positive": 16
+    }
+  }
+}

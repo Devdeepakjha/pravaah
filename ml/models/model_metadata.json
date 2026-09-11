@@ -1,0 +1,31 @@
+{
+  "model_version": "pravaah-xgb-v1.0-sikkim-ne",
+  "features": [
+    "elevation",
+    "slope",
+    "curvature",
+    "aspect_sin",
+    "aspect_cos",
+    "landcover",
+    "rain_24h",
+    "rain_72h",
+    "rain_7d",
+    "rainfall_intensity",
+    "historical_landslide_density",
+    "terrain_ruggedness"
+  ],
+  "n_features": 12,
+  "target": "landslide",
+  "classes": [
+    0,
+    1
+  ],
+  "class_names": [
+    "No Landslide",
+    "Landslide Event"
+  ],
+  "train_samples": 308,
+  "val_samples": 73,
+  "test_samples": 73,
+  "created_at": "2026-09-11"
+}

@@ -1,6 +1,32 @@
-export type RiskLevel = 'LOW' | 'MODERATE' | 'HIGH' | 'CRITICAL';
+export type RiskLevel = 'LOW' | 'MODERATE' | 'HIGH' | 'VERY_HIGH' | 'EXTREME' | 'CRITICAL';
 export type RiskTrend = 'INCREASING' | 'STABLE' | 'DECREASING';
 export type DataSource = 'DEMO_SIMULATION' | 'LIVE_TELEMETRY';
+
+export interface MLPredictionFactor {
+  feature: string;
+  label: string;
+  value: number;
+  impact: number;
+  impact_pct: number;
+  direction: 'elevating' | 'suppressing';
+  description: string;
+}
+
+export interface MLPredictionDetail {
+  grid_id: string;
+  latitude: number;
+  longitude: number;
+  risk_score: number;
+  risk_level: string;
+  rain_24h: number;
+  rain_72h: number;
+  rain_7d: number;
+  slope: number;
+  elevation: number;
+  model_version: string;
+  prediction_time: string;
+  top_factors: MLPredictionFactor[];
+}
 
 export interface HazardDriver {
   id: string;
@@ -52,4 +78,6 @@ export interface RiskZone {
   telemetry: ZoneTelemetry;
   dataSource: DataSource;
   updatedAt: string;
+  mlPrediction?: MLPredictionDetail;
 }
+

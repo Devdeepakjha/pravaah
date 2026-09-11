@@ -48,6 +48,30 @@ export const RISK_COLORS: Record<RiskLevel, {
     dotClass: 'bg-orange-500',
     label: 'High Risk',
   },
+  VERY_HIGH: {
+    hex: '#EF4444',
+    fillHex: '#EF4444',
+    fillOpacity: 0.25,
+    strokeHex: '#DC2626',
+    bgClass: 'bg-red-50',
+    textClass: 'text-red-700',
+    borderClass: 'border-red-200',
+    badgeClass: 'bg-red-50 text-red-700 border-red-200',
+    dotClass: 'bg-red-500',
+    label: 'Very High Risk',
+  },
+  EXTREME: {
+    hex: '#991B1B',
+    fillHex: '#991B1B',
+    fillOpacity: 0.32,
+    strokeHex: '#7F1D1D',
+    bgClass: 'bg-rose-100',
+    textClass: 'text-rose-900',
+    borderClass: 'border-rose-300',
+    badgeClass: 'bg-rose-100 text-rose-900 border-rose-300',
+    dotClass: 'bg-rose-700',
+    label: 'Extreme Risk',
+  },
   CRITICAL: {
     hex: '#EF4444',
     fillHex: '#EF4444',
@@ -61,6 +85,7 @@ export const RISK_COLORS: Record<RiskLevel, {
     label: 'Critical Risk',
   },
 };
+
 
 export const GIS_UI_COLORS = {
   primary: '#0F172A', // Slate-900

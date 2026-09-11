@@ -1,0 +1,14 @@
+{
+  "slope": 1.9008,
+  "rain_7d": 1.858,
+  "terrain_ruggedness": 0.7325,
+  "historical_landslide_density": 0.1392,
+  "curvature": 0.0497,
+  "aspect_cos": 0.0486,
+  "elevation": 0.037,
+  "rain_72h": 0.0226,
+  "aspect_sin": 0.0,
+  "landcover": 0.0,
+  "rain_24h": 0.0,
+  "rainfall_intensity": 0.0
+}

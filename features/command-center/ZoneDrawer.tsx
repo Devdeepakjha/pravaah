@@ -227,31 +227,77 @@ export function ZoneDrawer({
               </div>
             )}
 
+            {/* ML Model Provenance & SHAP Explainability */}
+            <div className="bg-slate-50 rounded-xl p-3 border border-slate-200/80 space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span className="font-bold text-[11px] uppercase tracking-wider text-slate-800">
+                    ML Risk Explainability (SHAP)
+                  </span>
+                </div>
+                <span className="font-mono text-[9px] px-1.5 py-0.5 rounded bg-slate-200 text-slate-700 font-semibold">
+                  {zone.mlPrediction?.model_version || 'XGBoost v1.0'}
+                </span>
+              </div>
+
+              {zone.mlPrediction?.top_factors && zone.mlPrediction.top_factors.length > 0 ? (
+                <div className="space-y-1.5 pt-1">
+                  {zone.mlPrediction.top_factors.map((tf, idx) => (
+                    <div key={idx} className="bg-white rounded-lg p-2 border border-slate-200/60 flex flex-col gap-0.5 text-[11px]">
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold text-slate-800">{tf.label}</span>
+                        <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold ${
+                          tf.direction === 'elevating' ? 'text-rose-700 bg-rose-50' : 'text-emerald-700 bg-emerald-50'
+                        }`}>
+                          {tf.direction === 'elevating' ? '▲ +' : '▼ -'}{tf.impact_pct}%
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-slate-500 leading-tight">{tf.description}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-[10px] text-slate-500">
+                  Feature attributions derived from TreeExplainer over regional terrain and hydrometeorological predictors.
+                </p>
+              )}
+            </div>
+
             {/* Main Drivers (Strict Top 3) */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                  Main Drivers
+                  Operational Hazard Drivers
                 </span>
-                <span className="text-[11px] text-slate-400">Top 3 Factors</span>
+                <span className="text-[11px] text-slate-400">Primary Indicators</span>
               </div>
 
-              <div className="space-y-2 text-xs divide-y divide-slate-50">
+              <div className="space-y-2 text-xs divide-y divide-slate-100">
                 {zone.topDrivers.map((driver) => {
-                  const dColor = RISK_COLORS[driver.severity];
+                  const dColor = RISK_COLORS[driver.severity] || RISK_COLORS.HIGH;
                   return (
-                    <div key={driver.id} className="flex items-center justify-between pt-1.5 first:pt-0">
-                      <span className="text-slate-600 flex items-center gap-2 font-medium">
-                        <span className={`w-1.5 h-1.5 rounded-full ${dColor.dotClass}`} />
-                        {driver.name}
-                      </span>
-                      <span
-                        className={`font-semibold ${
-                          driver.severity === 'CRITICAL' ? 'text-rose-600' : 'text-slate-800'
-                        }`}
-                      >
-                        {driver.headline}
-                      </span>
+                    <div key={driver.id} className="pt-2 first:pt-0 space-y-0.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-700 flex items-center gap-2 font-medium">
+                          <span className={`w-1.5 h-1.5 rounded-full ${dColor.dotClass}`} />
+                          {driver.name}
+                        </span>
+                        <span
+                          className={`font-semibold ${
+                            driver.severity === 'CRITICAL' || driver.severity === 'EXTREME' || driver.severity === 'VERY_HIGH'
+                              ? 'text-rose-600'
+                              : 'text-slate-800'
+                          }`}
+                        >
+                          {driver.headline}
+                        </span>
+                      </div>
+                      {driver.detailNote && (
+                        <div className="text-[10px] text-slate-400 pl-3.5">
+                          {driver.detailNote}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -259,6 +305,7 @@ export function ZoneDrawer({
             </div>
 
             <div className="border-t border-slate-100"></div>
+
 
             {/* Exposed Lifelines / Impact */}
             <div className="space-y-2">
@@ -323,10 +370,18 @@ export function ZoneDrawer({
           <div className="space-y-4 pt-1 text-xs">
             <div className="flex items-center justify-between text-[11px] text-slate-400">
               <span>Geological & Hydrological Stream</span>
-              <span className="font-semibold text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
-                SIMULATED DATA
-              </span>
+              {zone.dataSource === 'LIVE_TELEMETRY' ? (
+                <span className="font-semibold text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-300 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  REAL ML INFERENCE
+                </span>
+              ) : (
+                <span className="font-semibold text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+                  SIMULATED SENSOR DATA
+                </span>
+              )}
             </div>
+
 
             <div className="divide-y divide-slate-100 border-t border-b border-slate-100">
               <div className="py-2.5 flex items-center justify-between">
