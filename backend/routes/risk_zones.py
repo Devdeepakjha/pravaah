@@ -188,15 +188,38 @@ BASE_SECTORS = [
 ]
 
 
+from backend.services.weather_service import get_weather_service
+
+# Inference prediction cache: (zone_id, rain_24h, rain_72h, rain_7d) -> cached result
+_RISK_CACHE = {}
+
+
 @router.get("/api/v1/risk-zones")
 async def get_risk_zones():
     engine = get_inference_engine()
+    weather_svc = get_weather_service()
     now_str = datetime.now(timezone.utc).isoformat()
 
     enriched_zones = []
     for s in BASE_SECTORS:
-        # Run live XGBoost prediction
-        pred = engine.predict_one(s)
+        # Fetch current meteorological conditions for sector district
+        weather = weather_svc.get_district_weather(s["district"])
+        rain_24h = weather.get("rainfall_24h", s["rain_24h"])
+        rain_72h = weather.get("rainfall_72h", s["rain_72h"])
+        rain_7d = weather.get("rainfall_7d", s["rain_7d"])
+
+        # Cache key based on static sector and dynamic rainfall
+        cache_key = (s["id"], rain_24h, rain_72h, rain_7d)
+        if cache_key in _RISK_CACHE:
+            pred = _RISK_CACHE[cache_key]
+        else:
+            inference_input = dict(s)
+            inference_input["rain_24h"] = rain_24h
+            inference_input["rain_72h"] = rain_72h
+            inference_input["rain_7d"] = rain_7d
+            pred = engine.predict_one(inference_input)
+            _RISK_CACHE[cache_key] = pred
+
         score = pred["risk_score"]
         level = pred["risk_level"]
 
@@ -234,30 +257,39 @@ async def get_risk_zones():
 
         zone_payload = {
             "id": s["id"],
+            "grid_id": s["grid_id"],
             "name": s["name"],
             "district": s["district"],
             "state": s["state"],
             "basin": s["basin"],
             "riskScore": score,
             "riskLevel": level,
-            "trend": "INCREASING" if s["rain_24h"] > 50 else ("STABLE" if s["rain_24h"] > 25 else "DECREASING"),
-            "trendRate": f"↑ {round(s['rain_24h']/10, 1)}% in 24h" if s["rain_24h"] > 50 else "Stable (low precip)",
+            "riskStatement": f"Estimated landslide risk: {score}% (model-based estimate)",
+            "disclaimer": "Probabilistic risk estimate generated via trained XGBoost model. Not a deterministic guarantee of slope failure.",
+            "confidence": "High (ROC-AUC: 0.933)",
+            "trend": "INCREASING" if rain_24h > 50 else ("STABLE" if rain_24h > 25 else "DECREASING"),
+            "trendRate": f"↑ {round(rain_24h/10, 1)}% in 24h" if rain_24h > 50 else "Stable (low precip)",
             "center": s["center"],
             "polygon": s["polygon"],
             "topDrivers": top_drivers,
             "impact": s["impact"],
             "primaryAction": s["primaryAction"],
             "telemetry": {
-                "rainfall24h": s["rain_24h"],
-                "rainfallAnomalyPercent": round((s["rain_24h"] - 25.0) / 25.0 * 100, 1),
-                "soilSaturationPercent": min(98.0, round((s["rain_7d"] / 400.0) * 100, 1)),
-                "piezometerWaterTableMeters": round(2.8 + (s["rain_72h"] / 100.0) * 2.2, 2),
+                "rainfall24h": rain_24h,
+                "rainfallAnomalyPercent": round((rain_24h - 25.0) / 25.0 * 100, 1),
+                "soilSaturationPercent": min(98.0, round((rain_7d / 400.0) * 100, 1)),
+                "piezometerWaterTableMeters": round(2.8 + (rain_72h / 100.0) * 2.2, 2),
                 "insarDeformationRateMmYear": round(12.0 + (score / 100.0) * 45.0, 1),
                 "slopeAngleDeg": s["slope"],
+                "elevationMeters": s["elevation"],
+                "curvature": s["curvature"],
                 "soilType": "Metamorphic Schist / Sandy Loam"
             },
-            "dataSource": "LIVE_TELEMETRY",
+            "dataSource": weather.get("source", "DEMO_REPLAY"),
+            "dataFreshness": weather.get("freshness", "Calibrated Replay Scenario"),
+            "warningLevel": weather.get("warning_level", "YELLOW"),
             "updatedAt": now_str,
+            "modelVersion": pred["model_version"],
             "mlPrediction": pred
         }
         enriched_zones.append(zone_payload)
