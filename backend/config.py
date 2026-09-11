@@ -14,13 +14,27 @@ RISK_THRESHOLDS = {
 }
 
 # CORS Allowed Origins
-CORS_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-    "*"
-]
+_env_cors = os.getenv("CORS_ORIGINS", "")
+if _env_cors:
+    # Explicit comma-separated origins from production environment
+    CORS_ORIGINS = [origin.strip() for origin in _env_cors.split(",") if origin.strip()]
+    # Ensure local development is always included for seamless dual-testing
+    for dev_origin in ["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:3001", "http://127.0.0.1:3001"]:
+        if dev_origin not in CORS_ORIGINS:
+            CORS_ORIGINS.append(dev_origin)
+else:
+    # Default local dev & common frontend deploy preview origins
+    CORS_ORIGINS = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3001",
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+    ]
+
+# Permitted Origin Regex for Vercel Preview Deployments
+CORS_ORIGIN_REGEX = os.getenv("CORS_ORIGIN_REGEX", r"https://.*\.vercel\.app|https://.*\.trycloudflare\.com")
 
 API_V1_PREFIX = "/api/v1"
 

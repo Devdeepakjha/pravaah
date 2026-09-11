@@ -202,8 +202,10 @@ async def submit_field_report(
         if len(image_bytes) > 10 * 1024 * 1024:
             raise HTTPException(status_code=400, detail="Image exceeds maximum allowed size of 10 MB.")
 
-        # Save image safely
-        ext = os.path.splitext(image.filename)[1].lower() or ".jpg"
+        # Save image safely with strict extension whitelisting
+        ext = os.path.splitext(image.filename)[1].lower()
+        if ext not in [".jpg", ".jpeg", ".png", ".webp"]:
+            ext = ".jpg"
         clean_filename = f"{report_id}{ext}"
         saved_path = os.path.join(UPLOADS_DIR, clean_filename)
         with open(saved_path, "wb") as f:
