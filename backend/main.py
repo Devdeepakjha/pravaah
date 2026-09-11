@@ -13,6 +13,7 @@ from backend.routes.risk_zones import router as risk_zones_router
 from backend.routes.weather import router as weather_router
 from backend.routes.simulation import router as simulation_router
 from backend.routes.field_reports import router as field_reports_router
+from backend.routes.response import router as response_router
 
 app = FastAPI(
     title="PRAVAAH Landslide Intelligence ML API",
@@ -39,6 +40,7 @@ app.include_router(risk_zones_router)
 app.include_router(weather_router)
 app.include_router(simulation_router)
 app.include_router(field_reports_router)
+app.include_router(response_router)
 
 
 @app.get("/health")
