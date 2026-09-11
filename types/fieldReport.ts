@@ -26,5 +26,15 @@ export interface FieldReport {
   estimatedDebrisVolumeM3?: number;
   affectedCorridor?: string;
   photos?: string[];
+  imageUrl?: string;
+  severity?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  aiAnalysis?: {
+    severity: string;
+    operational_priority_influence: string;
+    confidence: number;
+    evidence: string[];
+    analysis_source: string;
+    disclaimer: string;
+  };
   dataSource: DataSource;
 }
