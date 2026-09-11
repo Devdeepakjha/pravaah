@@ -46,6 +46,17 @@ export function CitizenViewModal({
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
   const [showHelplines, setShowHelplines] = useState(false);
 
+  // Close on Escape key
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) onClose();
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const currentZone = riskZones.find((z) => z.id === activeZoneId) || riskZones[0];
@@ -58,8 +69,13 @@ export function CitizenViewModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/65 backdrop-blur-md p-4 animate-in fade-in duration-150 select-none">
-      <div className="bg-white rounded-3xl shadow-floating border border-slate-200 w-full max-w-xl max-h-[92vh] overflow-hidden flex flex-col">
+    <div 
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/65 backdrop-blur-md p-4 animate-in fade-in duration-150 select-none overflow-y-auto"
+    >
+      <div className="bg-white rounded-3xl shadow-floating border border-slate-200 w-full max-w-xl max-h-[calc(100dvh-2rem)] overflow-hidden flex flex-col my-auto">
         {/* Header */}
         <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-900 to-slate-800 text-white">
           <div className="flex items-center gap-3">

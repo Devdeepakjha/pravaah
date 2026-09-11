@@ -66,7 +66,7 @@ export function NavigationDock({
   ];
 
   return (
-    <nav className="absolute top-24 left-5 z-20 flex flex-col items-center bg-white/95 backdrop-blur-md p-2 rounded-2xl shadow-floating border border-slate-200/80 gap-1.5 select-none pointer-events-auto">
+    <nav className="absolute top-24 left-5 z-20 hidden sm:flex flex-col items-center bg-white/95 backdrop-blur-md p-2 rounded-2xl shadow-floating border border-slate-200/80 gap-1.5 select-none pointer-events-auto">
       {items.map((item) => {
         const Icon = item.icon;
         const isActive = activeTab === item.id;

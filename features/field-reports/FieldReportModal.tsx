@@ -50,6 +50,17 @@ export function FieldReportModal({
   const [submittedReport, setSubmittedReport] = useState<FieldReport | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Close on Escape key
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) onClose();
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,8 +104,13 @@ export function FieldReportModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 animate-in fade-in duration-150">
-      <div className="bg-white rounded-2xl shadow-floating border border-slate-200/80 w-full max-w-xl max-h-[90vh] overflow-hidden flex flex-col">
+    <div 
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 animate-in fade-in duration-150 overflow-y-auto"
+    >
+      <div className="bg-white rounded-2xl shadow-floating border border-slate-200/80 w-full max-w-xl max-h-[calc(100dvh-2rem)] overflow-hidden flex flex-col my-auto">
         {/* Modal Header */}
         <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
           <div className="flex items-center gap-2.5">

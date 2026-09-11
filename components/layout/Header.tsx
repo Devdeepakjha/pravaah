@@ -170,7 +170,7 @@ export function Header({
       </div>
 
       {/* Center: Search Pill & Situation Chip */}
-      <div className="flex items-center gap-2.5 pointer-events-auto">
+      <div className="hidden md:flex items-center gap-2.5 pointer-events-auto">
         {/* Search Input Container */}
         <div ref={searchContainerRef} className="relative">
           <div className="flex items-center bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-full shadow-floating border border-slate-200/80 w-72 md:w-88 text-xs text-slate-600 hover:border-slate-300 transition-all">
@@ -281,7 +281,7 @@ export function Header({
         {/* Floating Situation Pill */}
         <button
           onClick={onOpenAlerts}
-          className="flex items-center gap-2 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-full shadow-floating border border-slate-200/80 text-xs font-semibold text-slate-700 hover:bg-white hover:text-slate-900 transition-all cursor-pointer"
+          className="hidden lg:flex items-center gap-2 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-full shadow-floating border border-slate-200/80 text-xs font-semibold text-slate-700 hover:bg-white hover:text-slate-900 transition-all cursor-pointer"
         >
           <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
           <span className="text-rose-600 font-semibold">{situation.criticalZonesCount} critical areas</span>
@@ -336,7 +336,7 @@ export function Header({
         <div className="h-4 w-px bg-slate-200 mx-0.5"></div>
 
         {/* Operations Agency Badge */}
-        <div className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-lg">
+        <div className="hidden xl:flex items-center gap-2 pl-1 pr-2 py-1 rounded-lg">
           <div className="w-7 h-7 rounded-full bg-slate-900 text-white flex items-center justify-center text-[11px] font-bold">
             DD
           </div>

@@ -69,8 +69,17 @@ export function ZoneDrawer({
     onDispatchProtocol?.(zone);
   };
 
+  // Close on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   return (
-    <aside className="absolute top-4 right-5 bottom-6 w-96 max-w-[calc(100vw-2.5rem)] bg-white/98 backdrop-blur-xl rounded-2xl shadow-panel border border-slate-200/90 z-30 flex flex-col justify-between overflow-hidden select-none pointer-events-auto animate-in slide-in-from-right-4 duration-200">
+    <aside className="absolute top-20 right-5 bottom-6 w-96 max-w-[calc(100vw-2.5rem)] bg-white/98 backdrop-blur-xl rounded-2xl shadow-panel border border-slate-200/90 z-30 flex flex-col justify-between overflow-hidden select-none pointer-events-auto animate-in slide-in-from-right-4 duration-200">
       {/* Scrollable Body */}
       <div className="flex-1 overflow-y-auto custom-scroll p-5 space-y-4">
         {/* Drawer Header: Breadcrumb, Close & Title */}

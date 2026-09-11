@@ -443,6 +443,18 @@ export default function CitizenPage() {
         )}
       </main>
 
+      {/* Citizen Safety Portal Footer */}
+      <footer className="mt-auto py-8 px-4 text-center text-xs text-slate-400 border-t border-slate-200/80 bg-white/60">
+        <div className="max-w-2xl mx-auto space-y-1">
+          <p className="font-semibold text-slate-600">
+            PRAVAAH Citizen Safety Portal · Dial 112 for National Emergency Rescue
+          </p>
+          <p className="text-[11px] text-slate-400">
+            Ministry of Development of North Eastern Region (MDoNER) · Smart India Hackathon 2026
+          </p>
+        </div>
+      </footer>
+
       {/* Field Report Modal */}
       <FieldReportModal
         isOpen={isReportModalOpen}

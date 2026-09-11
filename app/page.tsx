@@ -28,6 +28,17 @@ import {
 export default function LandingPage() {
   const [roleModalOpen, setRoleModalOpen] = useState(false);
 
+  // Close modal on Escape key
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setRoleModalOpen(false);
+    };
+    if (roleModalOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [roleModalOpen]);
+
   return (
     <div className="min-h-screen bg-slate-900 text-white selection:bg-emerald-500 selection:text-slate-950 antialiased overflow-x-hidden">
       {/* 1. TOP NAVIGATION BAR */}
@@ -460,8 +471,13 @@ export default function LandingPage() {
 
       {/* DEMO ROLE SELECTION MODAL */}
       {roleModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
+        <div 
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setRoleModalOpen(false);
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 animate-in fade-in overflow-y-auto"
+        >
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-md w-full max-h-[calc(100dvh-2rem)] overflow-y-auto my-auto space-y-4 shadow-2xl">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-white text-base">Select Demo Experience</h3>
               <button

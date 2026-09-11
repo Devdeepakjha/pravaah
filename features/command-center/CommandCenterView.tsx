@@ -187,7 +187,7 @@ export function CommandCenterView() {
   };
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-slate-100 text-slate-800 antialiased select-none">
+    <div className="relative w-full h-screen max-h-screen md:h-[100dvh] overflow-hidden bg-slate-100 text-slate-800 antialiased select-none">
       {/* 1. FULL-BLEED 100vw x 100vh GIS MAP ENGINE UNDERLAY */}
       <div className="absolute inset-0 w-full h-full z-0">
         <Map

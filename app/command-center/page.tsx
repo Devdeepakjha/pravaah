@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function CommandCenterPage() {
   return (
-    <main className="h-full w-full overflow-hidden">
+    <main className="w-full h-screen max-h-screen md:h-[100dvh] overflow-hidden">
       <CommandCenterView />
     </main>
   );

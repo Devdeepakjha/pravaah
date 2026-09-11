@@ -297,6 +297,18 @@ export default function ForecastPage() {
           </div>
         )}
       </main>
+
+      {/* Forecast Simulation Footer */}
+      <footer className="mt-auto py-8 px-4 text-center text-xs text-slate-400 border-t border-slate-200/80 bg-white/60">
+        <div className="max-w-4xl mx-auto space-y-1">
+          <p className="font-semibold text-slate-600">
+            PRAVAAH Simulation Sandbox · XGBoost Landslide Risk Inference
+          </p>
+          <p className="text-[11px] text-slate-400">
+            Real-time sensitivity analysis for dynamic pore-pressure and rainfall surges · SIH 2026 / MDoNER
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }

@@ -273,6 +273,18 @@ export default function ResponsePage() {
           </div>
         </div>
       </main>
+
+      {/* Incident Response Footer */}
+      <footer className="mt-auto py-8 px-4 text-center text-xs text-slate-400 border-t border-slate-200/80 bg-white/60">
+        <div className="max-w-4xl mx-auto space-y-1">
+          <p className="font-semibold text-slate-600">
+            PRAVAAH Incident Response Engine · Multi-Criteria P1/P2/P3 Prioritization
+          </p>
+          <p className="text-[11px] text-slate-400">
+            Dijkstra-based lifeline corridor routing & emergency bypass management · SIH 2026 / MDoNER
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Key, Server, Database, CheckCircle2, Globe, Cpu, CloudRain, ShieldCheck, Layers } from 'lucide-react';
 import { IS_LIVE_API_ENABLED, API_BASE_URL } from '@/services/api';
 
@@ -31,9 +31,23 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     }
   };
 
+  // Close on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4 select-none animate-in fade-in duration-150">
-      <div className="bg-white rounded-2xl shadow-modal border border-slate-200/90 w-full max-w-lg overflow-hidden flex flex-col">
+    <div 
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4 select-none animate-in fade-in duration-150 overflow-y-auto"
+    >
+      <div className="bg-white rounded-2xl shadow-modal border border-slate-200/90 w-full max-w-lg max-h-[calc(100dvh-2rem)] overflow-hidden flex flex-col my-auto">
         {/* Header */}
         <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
           <div className="flex items-center gap-2.5">
@@ -88,7 +102,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
         </div>
 
         {/* Tab contents */}
-        <div className="p-5 space-y-4 text-xs max-h-[60vh] overflow-y-auto">
+        <div className="p-5 space-y-4 text-xs flex-1 overflow-y-auto custom-scroll">
           {activeTab === 'system' && (
             <div className="space-y-3">
               {/* Provenance Card */}
