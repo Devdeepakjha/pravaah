@@ -14,6 +14,8 @@ export const MOCK_ALERTS: Alert[] = [
     recommendedAction: 'Immediate evacuation of 4 riverside wards in Singtam; complete diversion of traffic via NH-717A Reshi.',
     isBroadcasting: true,
     dataSource: 'DEMO_SIMULATION',
+    zoneId: 'zone-east-sikkim',
+    coordinates: { lat: 27.234, lng: 88.5 },
   },
   {
     id: 'alert-ar-02',
@@ -28,6 +30,8 @@ export const MOCK_ALERTS: Alert[] = [
     recommendedAction: 'Stage emergency earthmovers at vulnerable road cuttings; restrict vehicular night transit.',
     isBroadcasting: true,
     dataSource: 'DEMO_SIMULATION',
+    zoneId: 'zone-kurung-kumey',
+    coordinates: { lat: 27.9, lng: 93.3 },
   },
   {
     id: 'alert-as-03',
@@ -42,6 +46,8 @@ export const MOCK_ALERTS: Alert[] = [
     recommendedAction: 'Maintain 20 km/h speed limit and manual foot-patrol before express rake passage.',
     isBroadcasting: false,
     dataSource: 'DEMO_SIMULATION',
+    zoneId: 'zone-dima-hasao',
+    coordinates: { lat: 25.18, lng: 93.02 },
   },
 ];
 

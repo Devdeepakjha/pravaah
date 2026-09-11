@@ -30,13 +30,25 @@ export async function searchLocations(query: string): Promise<{
       z.impact.populationDetail.toLowerCase().includes(clean) ||
       z.impact.criticalRoadImpact.toLowerCase().includes(clean) ||
       (clean.includes('singtam') && z.id === 'zone-east-sikkim') ||
+      (clean.includes('dikchu') && z.id === 'zone-east-sikkim') ||
       (clean.includes('gangtok') && z.id === 'zone-east-sikkim') ||
       (clean.includes('teesta') && z.id === 'zone-east-sikkim') ||
+      (clean.includes('mangan') && z.id === 'zone-north-sikkim') ||
+      (clean.includes('chungthang') && z.id === 'zone-north-sikkim') ||
       (clean.includes('kurung') && z.id === 'zone-kurung-kumey') ||
+      (clean.includes('koloriang') && z.id === 'zone-kurung-kumey') ||
+      (clean.includes('haflong') && z.id === 'zone-dima-hasao') ||
+      (clean.includes('aizawl') && z.id === 'zone-champhai') ||
       (clean.includes('kumey') && z.id === 'zone-kurung-kumey')
   );
 
   const landmarks = [
+    {
+      name: 'North Sikkim — Mangan / Chungthang Corridor',
+      type: 'Upper Teesta / BRO Lifeline',
+      coordinates: { lat: 27.5200, lng: 88.5400 },
+      zoneId: 'zone-north-sikkim',
+    },
     {
       name: 'Singtam Basin & Highway Corridor',
       type: 'Teesta Basin / NH-10',

@@ -175,6 +175,11 @@ def test_06_field_reports_and_vision_screening(client):
     assert "disclaimer" in created["aiAnalysis"]
     assert "preliminary screening" in created["aiAnalysis"]["disclaimer"].lower()
 
+    # Clean up test artifact from persisted file
+    from backend.routes.field_reports import load_reports, save_reports
+    current_reports = load_reports()
+    save_reports([r for r in current_reports if r.get("id") != created["id"]])
+
 
 def test_07_response_priorities_matrix(client):
     """Test 7: Response prioritization returns P1/P2/P3 ordered queue with justifications."""

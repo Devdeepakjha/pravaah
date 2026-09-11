@@ -104,14 +104,23 @@ export default function CitizenPage() {
 
   const handleSelectZone = (zone: RiskZone) => {
     setSelectedZone(zone);
+    setRoutePlan(null);
     setSearchQuery('');
     setIsSearching(false);
   };
 
   const handleFindSafeRoute = async () => {
-    const plan = await calculateAlternativeRoute('sevoke', 'gangtok');
-    setRoutePlan(plan);
-    setToastMessage('Alternative route calculated: NH-717A Reshi Bypass avoids NH-10 blockade.');
+    if (selectedZone?.id === 'zone-east-sikkim') {
+      const plan = await calculateAlternativeRoute('sevoke', 'gangtok');
+      setRoutePlan(plan);
+      setToastMessage('Verified bypass corridor: NH-717A Reshi Bypass avoids NH-10 blockade.');
+    } else {
+      setRoutePlan({
+        unavailable: true,
+        sectorName: selectedZone?.name || 'this corridor',
+      });
+      setToastMessage(`Alternate route information unavailable for ${selectedZone?.name || 'this sector'}.`);
+    }
     setTimeout(() => setToastMessage(null), 5000);
   };
 
@@ -365,25 +374,54 @@ export default function CitizenPage() {
 
             {/* Safe Route Overlay if triggered */}
             {routePlan && (
-              <div className="p-4 bg-emerald-50 border-t border-emerald-200 space-y-2 text-xs animate-in fade-in">
-                <div className="flex items-center justify-between font-bold text-emerald-950">
+              <div
+                className={`p-4 border-t space-y-2 text-xs animate-in fade-in ${
+                  routePlan.unavailable
+                    ? 'bg-amber-50 border-amber-200'
+                    : 'bg-emerald-50 border-emerald-200'
+                }`}
+              >
+                <div
+                  className={`flex items-center justify-between font-bold ${
+                    routePlan.unavailable ? 'text-amber-950' : 'text-emerald-950'
+                  }`}
+                >
                   <span className="flex items-center gap-1.5">
-                    <Navigation className="w-4 h-4 text-emerald-600" />
-                    <span>Active Safe Detour Guidance</span>
+                    {routePlan.unavailable ? (
+                      <AlertTriangle className="w-4 h-4 text-amber-600" />
+                    ) : (
+                      <Navigation className="w-4 h-4 text-emerald-600" />
+                    )}
+                    <span>
+                      {routePlan.unavailable
+                        ? 'Corridor Transit Status'
+                        : 'Active Safe Detour Guidance'}
+                    </span>
                   </span>
-                  <button onClick={() => setRoutePlan(null)} className="text-slate-400 hover:text-slate-600 text-xs">
+                  <button onClick={() => setRoutePlan(null)} className="text-slate-400 hover:text-slate-600 text-xs cursor-pointer">
                     Dismiss
                   </button>
                 </div>
-                <div className="bg-white p-3 rounded-xl border border-emerald-200 space-y-1.5">
-                  <div className="font-semibold text-slate-900">{routePlan.alternativeRoute?.name}</div>
-                  <p className="text-[11px] text-slate-600 leading-relaxed">{routePlan.advisory}</p>
-                  <div className="flex gap-3 text-[11px] text-slate-500 pt-1 font-medium">
-                    <span>Distance: {routePlan.alternativeRoute?.distanceKm} km</span>
-                    <span>•</span>
-                    <span>Bypass Delta: +{routePlan.alternativeRoute?.distanceDeltaKm} km</span>
+                {routePlan.unavailable ? (
+                  <div className="bg-white p-3 rounded-xl border border-amber-200 space-y-1">
+                    <div className="font-semibold text-slate-900">
+                      Alternate route information unavailable
+                    </div>
+                    <p className="text-[11px] text-slate-600 leading-relaxed">
+                      No verified bypass corridor is documented for {routePlan.sectorName}. Do not attempt unverified valley diversions. Follow local District Disaster Management Authority (DDMA) and traffic police advisories.
+                    </p>
                   </div>
-                </div>
+                ) : (
+                  <div className="bg-white p-3 rounded-xl border border-emerald-200 space-y-1.5">
+                    <div className="font-semibold text-slate-900">{routePlan.alternativeRoute?.name}</div>
+                    <p className="text-[11px] text-slate-600 leading-relaxed">{routePlan.advisory}</p>
+                    <div className="flex gap-3 text-[11px] text-slate-500 pt-1 font-medium">
+                      <span>Distance: {routePlan.alternativeRoute?.distanceKm} km</span>
+                      <span>•</span>
+                      <span>Bypass Delta: +{routePlan.alternativeRoute?.distanceDeltaKm} km</span>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

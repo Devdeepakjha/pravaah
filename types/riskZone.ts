@@ -55,6 +55,8 @@ export interface ZoneTelemetry {
   insarDeformationRateMmYear: number; // mm/yr
   slopeAngleDeg: number; // degrees
   soilType: string;
+  elevationMeters?: number;
+  curvature?: number;
 }
 
 export interface RiskZone {

@@ -27,8 +27,12 @@ import { SituationOverview } from '@/types/alert';
 interface HeaderProps {
   situation: SituationOverview;
   riskZones: RiskZone[];
+  criticalCount?: number;
+  attentionCount?: number;
   onSelectZone: (zone: RiskZone) => void;
   onOpenAlerts: () => void;
+  onOpenCriticalAreas?: () => void;
+  onOpenAttentionAreas?: () => void;
   onSelectLocation?: (coords: { lat: number; lng: number }) => void;
   onOpenCitizenMode?: () => void;
   onOpenSettings?: () => void;
@@ -37,8 +41,12 @@ interface HeaderProps {
 export function Header({
   situation,
   riskZones,
+  criticalCount,
+  attentionCount,
   onSelectZone,
   onOpenAlerts,
+  onOpenCriticalAreas,
+  onOpenAttentionAreas,
   onSelectLocation,
   onOpenCitizenMode,
   onOpenSettings,
@@ -173,20 +181,20 @@ export function Header({
       <div className="hidden md:flex items-center gap-2.5 pointer-events-auto">
         {/* Search Input Container */}
         <div ref={searchContainerRef} className="relative">
-          <div className="flex items-center bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-full shadow-floating border border-slate-200/80 w-72 md:w-88 text-xs text-slate-600 hover:border-slate-300 transition-all">
+          <div className="flex items-center bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-full shadow-floating border border-slate-200/80 w-72 md:w-92 text-xs text-slate-600 hover:border-slate-300 transition-all">
             <Search className="w-4 h-4 text-slate-400 mr-2 shrink-0" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              onFocus={() => searchQuery.length > 0 && setIsSearchOpen(true)}
-              placeholder="Search village, district, corridor..."
+              onFocus={() => setIsSearchOpen(true)}
+              placeholder="Search a monitored area, village, road or district..."
               className="bg-transparent border-none p-0 text-xs text-slate-800 placeholder-slate-400 focus:outline-none w-full"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="text-slate-400 hover:text-slate-600 p-0.5"
+                className="text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -196,98 +204,142 @@ export function Header({
             </kbd>
           </div>
 
-          {/* Search Dropdown Results */}
-          {isSearchOpen && (searchResults.zones.length > 0 || searchResults.landmarks.length > 0) && (
+          {/* Search Dropdown Results & Monitored Areas Suggestions */}
+          {isSearchOpen && (
             <div className="absolute top-full mt-2 inset-x-0 bg-white/98 backdrop-blur-md rounded-2xl shadow-panel border border-slate-200/90 overflow-hidden z-50 text-xs max-h-80 overflow-y-auto">
-              {searchResults.zones.length > 0 && (
-                <div className="p-2 border-b border-slate-100">
-                  <div className="px-2.5 py-1 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
-                    Risk Zones
+              {!searchQuery.trim() ? (
+                /* Quick Monitored Areas Chips when query is empty */
+                <div className="p-3 space-y-2">
+                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    Monitored Geomorphic Areas
                   </div>
-                  {searchResults.zones.map((zone) => (
-                    <button
-                      key={zone.id}
-                      onClick={() => {
-                        onSelectZone(zone);
-                        setIsSearchOpen(false);
-                        setSearchQuery('');
-                      }}
-                      className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-slate-50 transition-colors text-left cursor-pointer"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`w-2 h-2 rounded-full ${
-                            zone.riskLevel === 'CRITICAL'
-                              ? 'bg-rose-500'
-                              : zone.riskLevel === 'HIGH'
-                              ? 'bg-amber-500'
-                              : 'bg-yellow-400'
-                          }`}
-                        />
-                        <div>
-                          <div className="font-semibold text-slate-900">{zone.name}</div>
-                          <div className="text-[11px] text-slate-500">
-                            {zone.district}, {zone.state} • {zone.basin}
+                  <div className="flex flex-wrap gap-1.5">
+                    {['East Sikkim', 'North Sikkim', 'Kurung Kumey', 'Dima Hasao', 'Champhai'].map((area) => (
+                      <button
+                        key={area}
+                        onClick={() => {
+                          setSearchQuery(area);
+                        }}
+                        className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition-colors cursor-pointer"
+                      >
+                        {area}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="text-[10px] text-slate-400 pt-1 border-t border-slate-100">
+                    Type a district, town, corridor or incident to focus the map.
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {searchResults.zones.length > 0 && (
+                    <div className="p-2 border-b border-slate-100">
+                      <div className="px-2.5 py-1 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                        Risk Zones
+                      </div>
+                      {searchResults.zones.map((zone) => (
+                        <button
+                          key={zone.id}
+                          onClick={() => {
+                            onSelectZone(zone);
+                            setIsSearchOpen(false);
+                            setSearchQuery('');
+                          }}
+                          className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-slate-50 transition-colors text-left cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`w-2 h-2 rounded-full ${
+                                zone.riskLevel === 'CRITICAL' || zone.riskLevel === 'EXTREME'
+                                  ? 'bg-rose-500'
+                                  : zone.riskLevel === 'VERY_HIGH' || zone.riskLevel === 'HIGH'
+                                  ? 'bg-amber-500'
+                                  : 'bg-emerald-500'
+                              }`}
+                            />
+                            <div>
+                              <div className="font-semibold text-slate-900">{zone.name}</div>
+                              <div className="text-[11px] text-slate-500">
+                                {zone.district}, {zone.state} • {zone.basin}
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                      <span className="text-[11px] font-bold text-slate-700">
-                        {zone.riskScore}%
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              )}
+                          <span className="text-[11px] font-bold text-slate-700">
+                            {zone.riskScore}%
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
 
-              {searchResults.landmarks.length > 0 && (
-                <div className="p-2">
-                  <div className="px-2.5 py-1 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
-                    Points of Interest & Corridors
-                  </div>
-                  {searchResults.landmarks.map((landmark, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => {
-                        if (landmark.zoneId) {
-                          const matched = riskZones.find((z) => z.id === landmark.zoneId);
-                          if (matched) {
-                            onSelectZone(matched);
-                          } else {
-                            onSelectLocation?.(landmark.coordinates);
-                          }
-                        } else {
-                          onSelectLocation?.(landmark.coordinates);
-                        }
-                        setIsSearchOpen(false);
-                        setSearchQuery('');
-                      }}
-                      className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-slate-50 transition-colors text-left cursor-pointer"
-                    >
-                      <div className="flex items-center gap-2">
-                        <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                        <div>
-                          <div className="font-semibold text-slate-900">{landmark.name}</div>
-                          <div className="text-[11px] text-slate-500">{landmark.type}</div>
-                        </div>
+                  {searchResults.landmarks.length > 0 && (
+                    <div className="p-2">
+                      <div className="px-2.5 py-1 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                        Points of Interest & Corridors
                       </div>
-                    </button>
-                  ))}
-                </div>
+                      {searchResults.landmarks.map((landmark, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => {
+                            if (landmark.zoneId) {
+                              const matched = riskZones.find((z) => z.id === landmark.zoneId);
+                              if (matched) {
+                                onSelectZone(matched);
+                              } else {
+                                onSelectLocation?.(landmark.coordinates);
+                              }
+                            } else {
+                              onSelectLocation?.(landmark.coordinates);
+                            }
+                            setIsSearchOpen(false);
+                            setSearchQuery('');
+                          }}
+                          className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-slate-50 transition-colors text-left cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2">
+                            <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                            <div>
+                              <div className="font-semibold text-slate-900">{landmark.name}</div>
+                              <div className="text-[11px] text-slate-500">{landmark.type}</div>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {searchResults.zones.length === 0 && searchResults.landmarks.length === 0 && (
+                    <div className="p-4 text-center text-slate-400 text-xs">
+                      No monitored sectors or assets match &quot;{searchQuery}&quot;.
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )}
         </div>
 
-        {/* Floating Situation Pill */}
-        <button
-          onClick={onOpenAlerts}
-          className="hidden lg:flex items-center gap-2 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-full shadow-floating border border-slate-200/80 text-xs font-semibold text-slate-700 hover:bg-white hover:text-slate-900 transition-all cursor-pointer"
-        >
-          <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
-          <span className="text-rose-600 font-semibold">{situation.criticalZonesCount} critical areas</span>
-          <span className="text-slate-300">·</span>
-          <span className="text-slate-600 font-normal">{situation.attentionZonesCount} require attention</span>
-        </button>
+        {/* Floating Situation Pill (Distinct Interactive Buttons) */}
+        <div className="hidden lg:flex items-center bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-full shadow-floating border border-slate-200/80 text-xs font-semibold text-slate-700">
+          <button
+            onClick={onOpenCriticalAreas || onOpenAlerts}
+            className="flex items-center gap-1.5 hover:text-rose-700 transition-colors cursor-pointer"
+            title="View all Critical Risk Sectors"
+          >
+            <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse shrink-0"></span>
+            <span className="text-rose-600 font-bold">
+              {criticalCount ?? situation.criticalZonesCount} critical areas
+            </span>
+          </button>
+          <span className="text-slate-300 mx-2">·</span>
+          <button
+            onClick={onOpenAttentionAreas || onOpenAlerts}
+            className="text-slate-600 hover:text-slate-900 font-normal transition-colors cursor-pointer"
+            title="View all Areas Requiring Attention"
+          >
+            <span>{attentionCount ?? situation.attentionZonesCount} require attention</span>
+          </button>
+        </div>
       </div>
 
       {/* Right: Controls & Profile */}

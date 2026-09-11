@@ -45,6 +45,7 @@ export function CitizenViewModal({
   );
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
   const [showHelplines, setShowHelplines] = useState(false);
+  const [routeStatusInfo, setRouteStatusInfo] = useState<string | null>(null);
 
   // Close on Escape key
   React.useEffect(() => {
@@ -64,6 +65,7 @@ export function CitizenViewModal({
 
   const handleZoneChange = (zoneId: string) => {
     setActiveZoneId(zoneId);
+    setRouteStatusInfo(null);
     const z = riskZones.find((item) => item.id === zoneId);
     if (z) onSelectZone(z);
   };
@@ -236,8 +238,14 @@ export function CitizenViewModal({
 
             <button
               onClick={() => {
-                onClose();
-                onShowSafeRoute();
+                if (currentZone && currentZone.id === 'zone-east-sikkim') {
+                  onClose();
+                  onShowSafeRoute();
+                } else {
+                  setRouteStatusInfo(
+                    `Alternate route information unavailable for ${currentZone?.name || 'this corridor'}. No verified bypass exists in database. Follow local DDMA and police transit checkpoints.`
+                  );
+                }
               }}
               className="p-3 bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-xl text-sky-800 text-center flex flex-col items-center gap-1.5 font-bold transition-all cursor-pointer group"
             >
@@ -253,6 +261,22 @@ export function CitizenViewModal({
               <span className="text-[11px] leading-tight">Emergency Help</span>
             </button>
           </div>
+
+          {/* Safe Route Availability Notice */}
+          {routeStatusInfo && (
+            <div className="p-3 bg-amber-50 border border-amber-300 rounded-xl text-xs text-amber-950 flex items-start justify-between gap-2 animate-in fade-in">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <span className="leading-relaxed font-medium">{routeStatusInfo}</span>
+              </div>
+              <button
+                onClick={() => setRouteStatusInfo(null)}
+                className="text-slate-400 hover:text-slate-700 p-0.5 cursor-pointer shrink-0"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
 
           {/* Emergency Helplines Flyout */}
           {showHelplines && (

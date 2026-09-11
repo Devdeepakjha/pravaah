@@ -25,6 +25,9 @@ import { getRoadCorridors, calculateAlternativeRoute } from '@/services/roadStat
 import { getFieldReports } from '@/services/fieldReportService';
 import { getInfrastructure } from '@/services/infrastructureService';
 import { getActiveAlerts, getSituationOverview } from '@/services/alertService';
+import { deriveMonitoredLocations, getCriticalLocations, getAttentionLocations } from '@/services/monitoredLocationService';
+import { OperationalTriageModal } from '@/components/layout/OperationalTriageModal';
+import { MonitoredLocation } from '@/types/monitoredLocation';
 import { SIKKIM_CENTER, DEFAULT_MAP_ZOOM } from '@/lib/geo';
 import { CheckCircle2, ShieldAlert, X, Navigation } from 'lucide-react';
 
@@ -41,11 +44,25 @@ export function CommandCenterView() {
   const [selectedZone, setSelectedZone] = useState<RiskZone | null>(null);
   const [activeNavTab, setActiveNavTab] = useState<NavigationTab>('map');
   const [isAlertsOpen, setIsAlertsOpen] = useState(false);
+  const [triageMode, setTriageMode] = useState<'critical' | 'attention' | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isCitizenModeOpen, setIsCitizenModeOpen] = useState(false);
   const [isPrioritiesOpen, setIsPrioritiesOpen] = useState(false);
   const [isFieldReportOpen, setIsFieldReportOpen] = useState(false);
   const [activeRoutePlan, setActiveRoutePlan] = useState<any | null>(null);
+
+  // Derive canonical monitored locations & triage sets
+  const monitoredLocations = React.useMemo(() => {
+    return deriveMonitoredLocations(riskZones, roadCorridors, fieldReports, infrastructure);
+  }, [riskZones, roadCorridors, fieldReports, infrastructure]);
+
+  const criticalLocations = React.useMemo(() => {
+    return getCriticalLocations(monitoredLocations);
+  }, [monitoredLocations]);
+
+  const attentionLocations = React.useMemo(() => {
+    return getAttentionLocations(monitoredLocations);
+  }, [monitoredLocations]);
 
   // Dispatched protocols tracking
   const [dispatchedProtocols, setDispatchedProtocols] = useState<Record<string, boolean>>({});
@@ -175,12 +192,46 @@ export function CommandCenterView() {
     }
   };
 
+  const handleSelectMonitoredLocation = useCallback(
+    (loc: MonitoredLocation) => {
+      setCenter({ lat: loc.latitude, lng: loc.longitude });
+      setZoom(12);
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.flyTo([loc.latitude, loc.longitude], 12, { duration: 0.8 });
+      }
+      // If linked to a risk zone, select it to focus drawer
+      const matchedZone = riskZones.find(
+        (z) =>
+          z.id === loc.id ||
+          loc.id.includes(z.id) ||
+          (loc.district && z.district.toLowerCase().includes(loc.district.toLowerCase()))
+      );
+      if (matchedZone) {
+        setSelectedZone(matchedZone);
+      }
+      setDispatchToast(`Focused sector: ${loc.name} (${loc.district || loc.state})`);
+      setTimeout(() => setDispatchToast(null), 4000);
+    },
+    [riskZones]
+  );
+
   const handleSelectAlert = (alertItem: Alert) => {
-    const matchedZone = riskZones.find((z) =>
-      alertItem.targetRegion.toLowerCase().includes(z.district.toLowerCase())
+    if (alertItem.coordinates) {
+      setCenter(alertItem.coordinates);
+      setZoom(12);
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.flyTo([alertItem.coordinates.lat, alertItem.coordinates.lng], 12, {
+          duration: 0.8,
+        });
+      }
+    }
+    const matchedZone = riskZones.find(
+      (z) =>
+        z.id === alertItem.zoneId ||
+        alertItem.targetRegion.toLowerCase().includes(z.district.toLowerCase())
     );
     if (matchedZone) {
-      handleSelectZone(matchedZone);
+      setSelectedZone(matchedZone);
     }
     setDispatchToast(`Focused alert sector: ${alertItem.title} (${alertItem.targetRegion})`);
     setTimeout(() => setDispatchToast(null), 5000);
@@ -253,8 +304,12 @@ export function CommandCenterView() {
         <Header
           situation={situation}
           riskZones={riskZones}
+          criticalCount={criticalLocations.length}
+          attentionCount={attentionLocations.length}
           onSelectZone={handleSelectZone}
           onOpenAlerts={() => setIsAlertsOpen(true)}
+          onOpenCriticalAreas={() => setTriageMode('critical')}
+          onOpenAttentionAreas={() => setTriageMode('attention')}
           onSelectLocation={handleSelectLocation}
           onOpenCitizenMode={() => setIsCitizenModeOpen(true)}
           onOpenSettings={() => setIsSettingsOpen(true)}
@@ -352,6 +407,16 @@ export function CommandCenterView() {
         }}
         alerts={alerts}
         onSelectAlert={handleSelectAlert}
+      />
+
+      <OperationalTriageModal
+        isOpen={triageMode !== null}
+        mode={triageMode || 'critical'}
+        onClose={() => setTriageMode(null)}
+        criticalLocations={criticalLocations}
+        attentionLocations={attentionLocations}
+        onSelectLocation={handleSelectMonitoredLocation}
+        onSwitchMode={(newMode) => setTriageMode(newMode)}
       />
 
       <SettingsModal

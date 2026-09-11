@@ -41,8 +41,13 @@ export function AlertsModal({ isOpen, onClose, alerts, onSelectAlert }: AlertsMo
               <ShieldAlert className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-bold text-slate-900 text-sm">Active Civil Defense Advisories</h3>
-              <p className="text-[11px] text-slate-500">Live operational alerts across Northeast India</p>
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold text-slate-900 text-sm">Operational Alert Simulation</h3>
+                <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                  DEMO / PREVIEW
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-500">Civil defense advisories linked to monitored risk zones</p>
             </div>
           </div>
           <button
@@ -58,8 +63,9 @@ export function AlertsModal({ isOpen, onClose, alerts, onSelectAlert }: AlertsMo
           {/* Notification Preview Testing Card */}
           <AlertPreviewSection />
 
-          <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider pt-1">
-            Active Regional Bulletins
+          <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider pt-1 flex items-center justify-between">
+            <span>Current Monitored Bulletins</span>
+            <span className="text-[10px] font-normal lowercase text-slate-400">({alerts.length} active advisories)</span>
           </div>
 
           {alerts.map((alert) => {
@@ -128,10 +134,16 @@ function AlertPreviewSection() {
 
   return (
     <div className="p-3 bg-slate-900 text-white rounded-xl space-y-2.5 border border-slate-800 text-xs">
+      {/* Simulation Notice Banner */}
+      <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px] flex items-center justify-between">
+        <span className="font-bold tracking-wide">DEMO / PREVIEW ONLY</span>
+        <span className="text-[10px] text-amber-200/80">No external SMS will be transmitted</span>
+      </div>
+
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5 font-bold text-sky-400 text-[11px]">
           <BellRing className="w-3.5 h-3.5" />
-          <span>Broadcast Notification Engine Preview</span>
+          <span>Broadcast Notification Engine (Simulation / Preview)</span>
         </div>
         <button
           onClick={() => {

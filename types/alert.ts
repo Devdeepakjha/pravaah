@@ -6,6 +6,8 @@ export interface Alert {
   severity: RiskLevel;
   title: string;
   targetRegion: string;
+  zoneId?: string;
+  coordinates?: { lat: number; lng: number };
   issuedAt: string;
   expiresAt: string;
   issuingAuthority: string; // e.g. "State Disaster Management Authority (SSDMA)"

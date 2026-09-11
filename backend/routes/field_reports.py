@@ -154,7 +154,13 @@ def save_reports(reports: List[Dict[str, Any]]):
 async def get_all_field_reports():
     """Returns list of verified and citizen/authority submitted field reports."""
     reports = load_reports()
-    return reports
+    # Ensure automated QA test fixtures are never exposed to operational UI
+    cleaned = [
+        r for r in reports
+        if "pytest" not in r.get("title", "").lower()
+        and "test geologist" not in str(r.get("reporter", {})).lower()
+    ]
+    return cleaned
 
 
 @router.post("")
