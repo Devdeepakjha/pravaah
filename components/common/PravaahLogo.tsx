@@ -1,0 +1,53 @@
+'use client';
+
+import React from 'react';
+
+interface PravaahLogoProps {
+  className?: string;
+  size?: number;
+}
+
+export function PravaahLogo({ className = 'w-7 h-7', size = 32 }: PravaahLogoProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 32 32"
+      width={size}
+      height={size}
+      fill="none"
+      aria-label="PRAVAAH logo"
+      role="img"
+      className={className}
+    >
+      {/* Background Badge */}
+      <rect width="32" height="32" rx="7.5" fill="#0f172a" />
+      <rect x="0.75" y="0.75" width="30.5" height="30.5" rx="6.75" stroke="#334155" strokeWidth="0.75" />
+
+      {/* Protective Vigilance Arcs (Early Warning Shield) */}
+      <path d="M 8.5 13 A 8 8 0 0 1 23.5 13" stroke="#38bdf8" strokeWidth="1" strokeLinecap="round" opacity="0.45" />
+      <path d="M 11.5 10.5 A 5 5 0 0 1 20.5 10.5" stroke="#10b981" strokeWidth="1" strokeLinecap="round" opacity="0.65" />
+
+      {/* Early Warning Beacon / Apex Point */}
+      <circle cx="16" cy="4.5" r="1.25" fill="#38bdf8" />
+
+      {/* Background Himalayan Ridge */}
+      <path d="M 5 20 L 9.5 14 L 13.5 17.5 L 18.5 13.5 L 22.5 17 L 27 20" stroke="#475569" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+
+      {/* Primary Himalayan Peak Silhouette */}
+      {/* Left illuminated slope */}
+      <path d="M 16 6.5 L 8.5 18.5 L 16 18.5 Z" fill="#ffffff" />
+      {/* Right shaded slope */}
+      <path d="M 16 6.5 L 23.5 18.5 L 16 18.5 Z" fill="#94a3b8" />
+      {/* Crisp Center Ridge Line */}
+      <line x1="16" y1="6.5" x2="16" y2="18.5" stroke="#0f172a" strokeWidth="0.75" />
+
+      {/* Flowing Water / Rainfall Currents (Pravaah - 3 Stream Confluence) */}
+      {/* Left Current */}
+      <path d="M 14 18.5 C 12.5 20.5 10 22 7.5 24.5" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" />
+      {/* Central Surge Current */}
+      <path d="M 16 18.5 C 17.2 21 15 23.5 15.5 27" stroke="#10b981" strokeWidth="1.6" strokeLinecap="round" />
+      {/* Right Current */}
+      <path d="M 17.5 19 C 19.5 21 21.8 22.8 24.5 25" stroke="#34d399" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+}

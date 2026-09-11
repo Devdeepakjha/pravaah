@@ -23,6 +23,7 @@ import {
 import { RiskZone } from '@/types/riskZone';
 import { searchLocations } from '@/services/riskZoneService';
 import { SituationOverview } from '@/types/alert';
+import { PravaahLogo } from '@/components/common/PravaahLogo';
 
 interface HeaderProps {
   situation: SituationOverview;
@@ -102,9 +103,7 @@ export function Header({
           className="flex items-center gap-2.5 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-xl shadow-floating border border-slate-200/80 hover:bg-slate-50 transition-colors"
           title="Return to Public Landing Page"
         >
-          <div className="w-7 h-7 rounded-lg bg-slate-900 flex items-center justify-center text-white font-bold text-xs shadow-xs">
-            P
-          </div>
+          <PravaahLogo className="w-7 h-7 rounded-lg shadow-xs shrink-0" size={28} />
           <div className="flex flex-col leading-tight">
             <div className="flex items-center gap-1.5">
               <span className="font-bold text-slate-900 tracking-tight text-sm">PRAVAAH</span>
