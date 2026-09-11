@@ -244,6 +244,29 @@ def test_09_routing_dijkstra_detour(client):
     assert "pakyong" in path
     assert dist > 100.0
 
+    # Zone-specific routing: East Sikkim returns bypass corridor
+    res_east = client.post("/api/v1/roads/route", json={"zone_id": "zone-east-sikkim"})
+    assert res_east.status_code == 200
+    data_east = res_east.json()
+    assert data_east["available"] is True
+    assert data_east["zoneId"] == "zone-east-sikkim"
+    assert "NH-717A" in data_east["alternativeRoute"]["name"]
+
+    # Zone-specific routing: North Sikkim has no verified bypass and does not fabricate
+    res_north = client.post("/api/v1/roads/route", json={"zone_id": "zone-north-sikkim"})
+    assert res_north.status_code == 200
+    data_north = res_north.json()
+    assert data_north["available"] is False
+    assert data_north["status"] == "NO_VERIFIED_DETOUR"
+    assert "alternate road bypass exists" in data_north["advisory"].lower() or "no verified" in data_north["advisory"].lower()
+
+    # Zone-specific routing: Kurung Kumey has no verified bypass
+    res_kk = client.post("/api/v1/roads/route", json={"zone_id": "zone-kurung-kumey"})
+    assert res_kk.status_code == 200
+    data_kk = res_kk.json()
+    assert data_kk["available"] is False
+    assert data_kk["status"] == "NO_VERIFIED_DETOUR"
+
 
 def test_10_invalid_inputs_and_errors(client):
     """Test 10: Robust error handling for 404, 422, and 400."""

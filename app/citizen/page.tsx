@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import {
   ShieldAlert,
   Search,
@@ -18,13 +19,27 @@ import {
   Users,
   Building2,
   ArrowRight,
-  Globe
+  Globe,
+  Loader2,
+  Map as MapIcon
 } from 'lucide-react';
 import { RiskZone } from '@/types/riskZone';
 import { getRiskZones, searchLocations } from '@/services/riskZoneService';
 import { calculateAlternativeRoute } from '@/services/roadStatusService';
 import { FieldReportModal } from '@/features/field-reports/FieldReportModal';
 import { RISK_COLORS } from '@/lib/colors';
+
+const DynamicLeafletMap = dynamic(() => import('@/maps/LeafletMapContainer'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-72 sm:h-80 flex items-center justify-center bg-slate-100 rounded-xl text-slate-400">
+      <div className="flex flex-col items-center gap-2">
+        <div className="w-6 h-6 border-2 border-slate-300 border-t-slate-800 rounded-full animate-spin"></div>
+        <span className="text-xs font-medium tracking-wide">Loading Safe Detour Map...</span>
+      </div>
+    </div>
+  ),
+});
 
 export default function CitizenPage() {
   const [riskZones, setRiskZones] = useState<RiskZone[]>([]);
@@ -39,6 +54,8 @@ export default function CitizenPage() {
   const [showHelplines, setShowHelplines] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [routePlan, setRoutePlan] = useState<any | null>(null);
+  const [isCalculatingRoute, setIsCalculatingRoute] = useState(false);
+  const [showMap, setShowMap] = useState(true);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [geoLocating, setGeoLocating] = useState(false);
 
@@ -90,6 +107,8 @@ export default function CitizenPage() {
             }
           });
           setSelectedZone(closest);
+          setRoutePlan(null);
+          setShowMap(false);
           setToastMessage(`Located: Matched nearest monitored sector ${closest.name}`);
           setTimeout(() => setToastMessage(null), 4000);
         }
@@ -105,23 +124,40 @@ export default function CitizenPage() {
   const handleSelectZone = (zone: RiskZone) => {
     setSelectedZone(zone);
     setRoutePlan(null);
+    setShowMap(false);
     setSearchQuery('');
     setIsSearching(false);
   };
 
   const handleFindSafeRoute = async () => {
-    if (selectedZone?.id === 'zone-east-sikkim') {
-      const plan = await calculateAlternativeRoute('sevoke', 'gangtok');
-      setRoutePlan(plan);
-      setToastMessage('Verified bypass corridor: NH-717A Reshi Bypass avoids NH-10 blockade.');
-    } else {
-      setRoutePlan({
-        unavailable: true,
-        sectorName: selectedZone?.name || 'this corridor',
-      });
-      setToastMessage(`Alternate route information unavailable for ${selectedZone?.name || 'this sector'}.`);
+    if (!selectedZone) return;
+    setIsCalculatingRoute(true);
+    try {
+      const plan = await calculateAlternativeRoute(undefined, undefined, selectedZone.id);
+      if (plan && plan.available !== false && !plan.unavailable && plan.alternativeRoute) {
+        setRoutePlan(plan);
+        setShowMap(true);
+        setToastMessage('Safe detour found: ' + (plan.alternativeRoute.name || 'Bypass corridor available'));
+      } else {
+        setRoutePlan({
+          unavailable: true,
+          sectorName: selectedZone.name,
+          advisory:
+            plan?.advisory ||
+            `Alternate route information unavailable for ${selectedZone.name}. No verified bypass corridor exists in road database. Follow local DDMA and police advisories.`,
+        });
+        setShowMap(false);
+        setToastMessage('No verified alternate route available');
+      }
+    } catch (err) {
+      console.error('Failed to calculate safe detour route:', err);
+      setRoutePlan(null);
+      setShowMap(false);
+      setToastMessage('Route service unavailable. Please follow local DDMA/traffic advisories.');
+    } finally {
+      setIsCalculatingRoute(false);
+      setTimeout(() => setToastMessage(null), 5000);
     }
-    setTimeout(() => setToastMessage(null), 5000);
   };
 
   const colorMeta = selectedZone ? RISK_COLORS[selectedZone.riskLevel] : RISK_COLORS['MODERATE'];
@@ -357,10 +393,20 @@ export default function CitizenPage() {
 
               <button
                 onClick={handleFindSafeRoute}
-                className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                disabled={isCalculatingRoute}
+                className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-600/70 text-white text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
               >
-                <Navigation className="w-4 h-4" />
-                <span>Find Safe Detour Route</span>
+                {isCalculatingRoute ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Finding safest available route…</span>
+                  </>
+                ) : (
+                  <>
+                    <Navigation className="w-4 h-4" />
+                    <span>Find Safe Detour Route</span>
+                  </>
+                )}
               </button>
 
               <button
@@ -375,7 +421,7 @@ export default function CitizenPage() {
             {/* Safe Route Overlay if triggered */}
             {routePlan && (
               <div
-                className={`p-4 border-t space-y-2 text-xs animate-in fade-in ${
+                className={`p-4 border-t space-y-3 text-xs animate-in fade-in ${
                   routePlan.unavailable
                     ? 'bg-amber-50 border-amber-200'
                     : 'bg-emerald-50 border-emerald-200'
@@ -386,40 +432,108 @@ export default function CitizenPage() {
                     routePlan.unavailable ? 'text-amber-950' : 'text-emerald-950'
                   }`}
                 >
-                  <span className="flex items-center gap-1.5">
-                    {routePlan.unavailable ? (
-                      <AlertTriangle className="w-4 h-4 text-amber-600" />
-                    ) : (
-                      <Navigation className="w-4 h-4 text-emerald-600" />
-                    )}
-                    <span>
-                      {routePlan.unavailable
-                        ? 'Corridor Transit Status'
-                        : 'Active Safe Detour Guidance'}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="flex items-center gap-1.5">
+                      {routePlan.unavailable ? (
+                        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                      ) : (
+                        <Navigation className="w-4 h-4 text-emerald-600 shrink-0" />
+                      )}
+                      <span>
+                        {routePlan.unavailable
+                          ? 'Corridor Transit Status'
+                          : 'Active Safe Detour Guidance'}
+                      </span>
                     </span>
-                  </span>
-                  <button onClick={() => setRoutePlan(null)} className="text-slate-400 hover:text-slate-600 text-xs cursor-pointer">
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        routePlan.unavailable
+                          ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                          : 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                      }`}
+                    >
+                      {routePlan.unavailable
+                        ? '⚠ No verified alternate route available'
+                        : '🟢 Alternative route available'}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setRoutePlan(null);
+                      setShowMap(false);
+                    }}
+                    className="text-slate-400 hover:text-slate-600 text-xs cursor-pointer ml-2"
+                  >
                     Dismiss
                   </button>
                 </div>
+
                 {routePlan.unavailable ? (
-                  <div className="bg-white p-3 rounded-xl border border-amber-200 space-y-1">
-                    <div className="font-semibold text-slate-900">
-                      Alternate route information unavailable
+                  <div className="bg-white p-3.5 rounded-xl border border-amber-200 space-y-1.5">
+                    <div className="font-semibold text-slate-900 flex items-center gap-1.5">
+                      <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                      <span>Alternate route information unavailable</span>
                     </div>
                     <p className="text-[11px] text-slate-600 leading-relaxed">
-                      No verified bypass corridor is documented for {routePlan.sectorName}. Do not attempt unverified valley diversions. Follow local District Disaster Management Authority (DDMA) and traffic police advisories.
+                      {routePlan.advisory ||
+                        `No verified bypass corridor is documented for ${routePlan.sectorName}. Do not attempt unverified valley diversions. Follow local District Disaster Management Authority (DDMA) and traffic police advisories.`}
                     </p>
+                    <div className="text-[10px] text-slate-400 italic pt-1">
+                      Notice: PRAVAAH only displays field-verified corridors to guarantee citizen safety.
+                    </div>
                   </div>
                 ) : (
-                  <div className="bg-white p-3 rounded-xl border border-emerald-200 space-y-1.5">
-                    <div className="font-semibold text-slate-900">{routePlan.alternativeRoute?.name}</div>
-                    <p className="text-[11px] text-slate-600 leading-relaxed">{routePlan.advisory}</p>
-                    <div className="flex gap-3 text-[11px] text-slate-500 pt-1 font-medium">
-                      <span>Distance: {routePlan.alternativeRoute?.distanceKm} km</span>
-                      <span>•</span>
-                      <span>Bypass Delta: +{routePlan.alternativeRoute?.distanceDeltaKm} km</span>
+                  <div className="bg-white p-3.5 rounded-xl border border-emerald-200 space-y-3">
+                    <div>
+                      <div className="font-bold text-slate-900 text-sm">
+                        {routePlan.alternativeRoute?.name}
+                      </div>
+                      <p className="text-[11px] text-slate-600 leading-relaxed mt-0.5">
+                        {routePlan.advisory}
+                      </p>
                     </div>
+
+                    <div className="flex flex-wrap items-center justify-between gap-2 pt-1.5 border-t border-slate-100 text-[11px]">
+                      <div className="flex flex-wrap items-center gap-2.5 text-slate-600 font-medium">
+                        <span>Distance: <strong>{routePlan.alternativeRoute?.distanceKm} km</strong></span>
+                        <span>•</span>
+                        <span>Bypass Delta: <strong>+{routePlan.alternativeRoute?.distanceDeltaKm} km</strong></span>
+                        <span>•</span>
+                        <span>Status: <strong className="text-emerald-700">Verified Alternative</strong></span>
+                      </div>
+                      <button
+                        onClick={() => setShowMap(!showMap)}
+                        className="flex items-center gap-1 text-emerald-700 hover:text-emerald-900 font-semibold cursor-pointer text-xs"
+                      >
+                        <MapIcon className="w-3.5 h-3.5" />
+                        <span>{showMap ? 'Hide map' : 'View route on map'}</span>
+                      </button>
+                    </div>
+
+                    {/* Interactive Route Map */}
+                    {showMap && (
+                      <div className="relative w-full h-72 sm:h-84 rounded-xl overflow-hidden border border-emerald-300/80 shadow-xs mt-2">
+                        <DynamicLeafletMap
+                          center={selectedZone?.center || { lat: 27.2345, lng: 88.5420 }}
+                          zoom={11}
+                          basemap="roadmap"
+                          layers={{
+                            riskZones: true,
+                            roadCorridors: true,
+                            fieldReports: false,
+                            infrastructure: false,
+                            safeRoutes: true,
+                          }}
+                          riskZones={riskZones}
+                          roadCorridors={[]}
+                          fieldReports={[]}
+                          infrastructure={[]}
+                          selectedZone={selectedZone}
+                          onSelectZone={handleSelectZone}
+                          activeRoutePlan={routePlan}
+                        />
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

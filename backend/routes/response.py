@@ -13,8 +13,9 @@ router = APIRouter(prefix="/api/v1", tags=["Response & Connectivity"])
 
 
 class RouteRequest(BaseModel):
-    origin: Optional[str] = Field("sevoke", description="Starting junction node ID or name (e.g., 'sevoke', 'rangpo')")
-    destination: Optional[str] = Field("gangtok", description="Destination node ID or name (e.g., 'gangtok', 'singtam')")
+    origin: Optional[str] = Field(None, description="Starting junction node ID or name (e.g., 'sevoke', 'rangpo')")
+    destination: Optional[str] = Field(None, description="Destination node ID or name (e.g., 'gangtok', 'singtam')")
+    zone_id: Optional[str] = Field(None, description="Monitored risk zone ID (e.g., 'zone-east-sikkim', 'zone-north-sikkim')")
 
 
 @router.get("/response/priorities")
@@ -48,7 +49,7 @@ async def get_roads_status():
 async def calculate_route(req: RouteRequest):
     """
     Calculates primary route vs alternative safe bypass corridor using graph Dijkstra routing.
-    Automatically isolates compromised or blocked highway links.
+    Supports canonical zone-specific resolution and isolates compromised highway links.
     """
-    plan = get_route_plan(req.origin or "sevoke", req.destination or "gangtok")
+    plan = get_route_plan(req.origin, req.destination, req.zone_id)
     return plan

@@ -16,10 +16,12 @@ import {
   ChevronUp,
   Droplets,
   Mountain,
-  Users
+  Users,
+  Loader2
 } from 'lucide-react';
 import { RiskZone } from '@/types/riskZone';
 import { RISK_COLORS } from '@/lib/colors';
+import { calculateAlternativeRoute } from '@/services/roadStatusService';
 
 interface CitizenViewModalProps {
   isOpen: boolean;
@@ -28,7 +30,7 @@ interface CitizenViewModalProps {
   selectedZone: RiskZone | null;
   onSelectZone: (zone: RiskZone) => void;
   onOpenReportModal: () => void;
-  onShowSafeRoute: () => void;
+  onShowSafeRoute: (zone: RiskZone, plan: any) => void;
 }
 
 export function CitizenViewModal({
@@ -46,6 +48,7 @@ export function CitizenViewModal({
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
   const [showHelplines, setShowHelplines] = useState(false);
   const [routeStatusInfo, setRouteStatusInfo] = useState<string | null>(null);
+  const [isCalculatingRoute, setIsCalculatingRoute] = useState(false);
 
   // Close on Escape key
   React.useEffect(() => {
@@ -237,20 +240,39 @@ export function CitizenViewModal({
             </button>
 
             <button
-              onClick={() => {
-                if (currentZone && currentZone.id === 'zone-east-sikkim') {
-                  onClose();
-                  onShowSafeRoute();
-                } else {
-                  setRouteStatusInfo(
-                    `Alternate route information unavailable for ${currentZone?.name || 'this corridor'}. No verified bypass exists in database. Follow local DDMA and police transit checkpoints.`
-                  );
+              onClick={async () => {
+                if (!currentZone) return;
+                setIsCalculatingRoute(true);
+                setRouteStatusInfo(null);
+                try {
+                  const plan = await calculateAlternativeRoute(undefined, undefined, currentZone.id);
+                  if (plan && plan.available !== false && !plan.unavailable && plan.alternativeRoute) {
+                    onClose();
+                    onShowSafeRoute(currentZone, plan);
+                  } else {
+                    setRouteStatusInfo(
+                      plan?.advisory ||
+                        `Alternate route information unavailable for ${currentZone.name}. No verified bypass corridor exists in database. Follow local DDMA and police transit checkpoints.`
+                    );
+                  }
+                } catch (err) {
+                  console.error('Failed to calculate safe detour:', err);
+                  setRouteStatusInfo('Route service unavailable. Please follow local DDMA/traffic advisories.');
+                } finally {
+                  setIsCalculatingRoute(false);
                 }
               }}
-              className="p-3 bg-sky-50 hover:bg-sky-100 border border-sky-200 rounded-xl text-sky-800 text-center flex flex-col items-center gap-1.5 font-bold transition-all cursor-pointer group"
+              disabled={isCalculatingRoute}
+              className="p-3 bg-sky-50 hover:bg-sky-100 disabled:bg-slate-100 border border-sky-200 rounded-xl text-sky-800 text-center flex flex-col items-center gap-1.5 font-bold transition-all cursor-pointer group"
             >
-              <Navigation className="w-5 h-5 text-sky-600 group-hover:scale-110 transition-transform" />
-              <span className="text-[11px] leading-tight">Find Safe Route</span>
+              {isCalculatingRoute ? (
+                <Loader2 className="w-5 h-5 text-sky-600 animate-spin" />
+              ) : (
+                <Navigation className="w-5 h-5 text-sky-600 group-hover:scale-110 transition-transform" />
+              )}
+              <span className="text-[11px] leading-tight">
+                {isCalculatingRoute ? 'Finding Route…' : 'Find Safe Detour Route'}
+              </span>
             </button>
 
             <button

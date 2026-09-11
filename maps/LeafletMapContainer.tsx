@@ -435,7 +435,7 @@ export default function LeafletMapContainer({
     }
 
     // 5. ACTIVE ROUTE / DETOUR OVERLAYS (When safeRoutes enabled)
-    if (activeRoutePlan && layers.safeRoutes !== false) {
+    if (activeRoutePlan && layers.safeRoutes !== false && activeRoutePlan.available !== false && !activeRoutePlan.unavailable) {
       // 5a. Primary blocked path (dashed rose/red line)
       if (activeRoutePlan.primaryRoute?.path && activeRoutePlan.primaryRoute.path.length > 1) {
         const primCoords = activeRoutePlan.primaryRoute.path.map((p: any) => [p.lat, p.lng] as [number, number]);
@@ -454,6 +454,24 @@ export default function LeafletMapContainer({
           { sticky: true, className: 'pravaah-map-tooltip' }
         );
         primLine.addTo(group);
+
+        // Prominent BLOCKED Label Badge on Blocked Road
+        const midIdx = Math.floor(primCoords.length / 2);
+        const labelCoord = primCoords[midIdx] || primCoords[0];
+        const blockedIcon = L.divIcon({
+          className: 'custom-div-icon',
+          html: `
+            <div class="pointer-events-none select-none">
+              <div class="flex items-center gap-1 bg-rose-600 text-white font-black text-[10px] px-2 py-0.5 rounded-md shadow-lg border border-white tracking-wider whitespace-nowrap">
+                <span>✕</span>
+                <span>BLOCKED</span>
+              </div>
+            </div>
+          `,
+          iconSize: [80, 22],
+          iconAnchor: [40, 11],
+        });
+        L.marker(labelCoord, { icon: blockedIcon, interactive: false }).addTo(group);
       }
 
       // 5b. Alternative detour path (solid emerald green line with outer glow)
@@ -484,6 +502,24 @@ export default function LeafletMapContainer({
           { sticky: true, className: 'pravaah-map-tooltip' }
         );
         detourLine.addTo(group);
+
+        // Prominent SAFE DETOUR Label Badge on Alternative Route
+        const altMidIdx = Math.floor(altCoords.length / 2);
+        const altLabelCoord = altCoords[altMidIdx] || altCoords[0];
+        const detourBadgeIcon = L.divIcon({
+          className: 'custom-div-icon',
+          html: `
+            <div class="pointer-events-none select-none">
+              <div class="flex items-center gap-1 bg-emerald-600 text-white font-bold text-[10px] px-2.5 py-0.5 rounded-full shadow-lg border-2 border-white tracking-wider whitespace-nowrap">
+                <span>→</span>
+                <span>SAFE DETOUR</span>
+              </div>
+            </div>
+          `,
+          iconSize: [105, 24],
+          iconAnchor: [52, 12],
+        });
+        L.marker(altLabelCoord, { icon: detourBadgeIcon, interactive: false }).addTo(group);
 
         // Waypoint markers along detour
         activeRoutePlan.alternativeRoute.path.forEach((pt: any, idx: number) => {

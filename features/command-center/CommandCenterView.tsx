@@ -115,6 +115,12 @@ export function CommandCenterView() {
     setSelectedZone(zone);
     setCenter(zone.center);
     setZoom(11.5);
+    setActiveRoutePlan((prev: any) => {
+      if (prev && prev.zoneId && prev.zoneId !== zone.id) {
+        return null;
+      }
+      return prev;
+    });
     if (mapInstanceRef.current) {
       mapInstanceRef.current.flyTo([zone.center.lat, zone.center.lng], 11.5, { duration: 0.8 });
     }
@@ -359,11 +365,13 @@ export function CommandCenterView() {
           setIsCitizenModeOpen(false);
           setIsFieldReportOpen(true);
         }}
-        onShowSafeRoute={async () => {
-          const plan = await calculateAlternativeRoute('sevoke', 'gangtok');
+        onShowSafeRoute={(zone: RiskZone, plan: any) => {
           setActiveRoutePlan(plan);
+          handleSelectZone(zone);
           setIsCitizenModeOpen(false);
-          setDispatchToast('Activated safe detour corridor via NH-717A Reshi-Algarah bypass.');
+          setDispatchToast(
+            `Activated safe detour corridor: ${plan.alternativeRoute?.name || 'Verified Bypass'}.`
+          );
         }}
       />
 
