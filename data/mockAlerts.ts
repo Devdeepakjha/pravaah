@@ -1,0 +1,56 @@
+import { Alert, SituationOverview } from '@/types/alert';
+
+export const MOCK_ALERTS: Alert[] = [
+  {
+    id: 'alert-sk-01',
+    code: 'NDMA-SK-2026-08',
+    severity: 'CRITICAL',
+    title: 'Teesta Gorge Slope Breach Warning',
+    targetRegion: 'East Sikkim (Singtam - Rangpo Corridor)',
+    issuedAt: '45 mins ago',
+    expiresAt: 'In 11 hours',
+    issuingAuthority: 'Sikkim State Disaster Management Authority (SSDMA)',
+    summary: 'High probability of catastrophic slope failure at Km 44 within next 6 hours under continuous torrential rainfall.',
+    recommendedAction: 'Immediate evacuation of 4 riverside wards in Singtam; complete diversion of traffic via NH-717A Reshi.',
+    isBroadcasting: true,
+    dataSource: 'DEMO_SIMULATION',
+  },
+  {
+    id: 'alert-ar-02',
+    code: 'DDMA-KK-2026-03',
+    severity: 'HIGH',
+    title: 'Flash Flood & Rockfall Advisory',
+    targetRegion: 'Kurung Kumey (Koloriang Sector)',
+    issuedAt: '2 hours ago',
+    expiresAt: 'In 22 hours',
+    issuingAuthority: 'District Disaster Management Authority, Koloriang',
+    summary: 'Saturation index exceeds 74%. Restricted night travel on all border link routes.',
+    recommendedAction: 'Stage emergency earthmovers at vulnerable road cuttings; restrict vehicular night transit.',
+    isBroadcasting: true,
+    dataSource: 'DEMO_SIMULATION',
+  },
+  {
+    id: 'alert-as-03',
+    code: 'NFR-DH-2026-11',
+    severity: 'MODERATE',
+    title: 'Rail Track Bed Saturation Watch',
+    targetRegion: 'Dima Hasao (Jatinga - Harangajao)',
+    issuedAt: '3 hours ago',
+    expiresAt: 'In 18 hours',
+    issuingAuthority: 'Northeast Frontier Railway Safety Cell',
+    summary: 'Caution order on kilometer 60-64. Track sensors active.',
+    recommendedAction: 'Maintain 20 km/h speed limit and manual foot-patrol before express rake passage.',
+    isBroadcasting: false,
+    dataSource: 'DEMO_SIMULATION',
+  },
+];
+
+export const MOCK_SITUATION_OVERVIEW: SituationOverview = {
+  criticalZonesCount: 3,
+  attentionZonesCount: 12,
+  totalMonitoredZones: 48,
+  sensorsOnlinePercentage: 98.4,
+  activeBlockadesCount: 1,
+  lastUpdated: '12 mins ago',
+  dataSource: 'DEMO_SIMULATION',
+};

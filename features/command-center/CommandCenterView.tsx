@@ -1,0 +1,271 @@
+'use client';
+
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import L from 'leaflet';
+import { Map } from '@/maps/Map';
+import { Header } from '@/components/layout/Header';
+import { NavigationDock, NavigationTab } from '@/components/layout/NavigationDock';
+import { MapControls, BasemapMode, ActiveLayers } from '@/maps/MapControls';
+import { RiskLegend } from '@/maps/RiskLegend';
+import { ZoneDrawer } from './ZoneDrawer';
+import { AlertsModal } from '@/features/alerts/AlertsModal';
+import { SettingsModal } from './SettingsModal';
+
+import { RiskZone } from '@/types/riskZone';
+import { RoadCorridor } from '@/types/roadStatus';
+import { FieldReport } from '@/types/fieldReport';
+import { Infrastructure } from '@/types/infrastructure';
+import { Alert, SituationOverview } from '@/types/alert';
+
+import { getRiskZones } from '@/services/riskZoneService';
+import { getRoadCorridors } from '@/services/roadStatusService';
+import { getFieldReports } from '@/services/fieldReportService';
+import { getInfrastructure } from '@/services/infrastructureService';
+import { getActiveAlerts, getSituationOverview } from '@/services/alertService';
+import { SIKKIM_CENTER, DEFAULT_MAP_ZOOM } from '@/lib/geo';
+import { CheckCircle2, ShieldAlert, X } from 'lucide-react';
+
+export function CommandCenterView() {
+  // Data states
+  const [riskZones, setRiskZones] = useState<RiskZone[]>([]);
+  const [roadCorridors, setRoadCorridors] = useState<RoadCorridor[]>([]);
+  const [fieldReports, setFieldReports] = useState<FieldReport[]>([]);
+  const [infrastructure, setInfrastructure] = useState<Infrastructure[]>([]);
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [situation, setSituation] = useState<SituationOverview | null>(null);
+
+  // Interaction states
+  const [selectedZone, setSelectedZone] = useState<RiskZone | null>(null);
+  const [activeNavTab, setActiveNavTab] = useState<NavigationTab>('map');
+  const [isAlertsOpen, setIsAlertsOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  // Dispatched protocols tracking
+  const [dispatchedProtocols, setDispatchedProtocols] = useState<Record<string, boolean>>({});
+  const [dispatchToast, setDispatchToast] = useState<string | null>(null);
+
+  // Map reference & controls states
+  const mapInstanceRef = useRef<L.Map | null>(null);
+  const [basemap, setBasemap] = useState<BasemapMode>('terrain');
+  const [center, setCenter] = useState<{ lat: number; lng: number }>(SIKKIM_CENTER);
+  const [zoom, setZoom] = useState<number>(DEFAULT_MAP_ZOOM);
+  const [layers, setLayers] = useState<ActiveLayers>({
+    riskZones: true,
+    roadCorridors: true,
+    infrastructure: true,
+    fieldReports: true,
+  });
+
+  // Load initial data
+  useEffect(() => {
+    async function loadData() {
+      const [zonesData, roadsData, reportsData, infraData, alertsData, sitData] =
+        await Promise.all([
+          getRiskZones(),
+          getRoadCorridors(),
+          getFieldReports(),
+          getInfrastructure(),
+          getActiveAlerts(),
+          getSituationOverview(),
+        ]);
+
+      setRiskZones(zonesData);
+      setRoadCorridors(roadsData);
+      setFieldReports(reportsData);
+      setInfrastructure(infraData);
+      setAlerts(alertsData);
+      setSituation(sitData);
+
+      // Focus on East Sikkim / Teesta Basin on initial load
+      const defaultZone = zonesData.find((z) => z.id === 'zone-east-sikkim') || zonesData[0];
+      if (defaultZone) {
+        setSelectedZone(defaultZone);
+        setCenter({ lat: 27.2600, lng: 88.5400 });
+      }
+    }
+    loadData();
+  }, []);
+
+  // Handlers
+  const handleSelectZone = useCallback((zone: RiskZone) => {
+    setSelectedZone(zone);
+    setCenter(zone.center);
+    setZoom(11.5);
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.flyTo([zone.center.lat, zone.center.lng], 11.5, { duration: 0.8 });
+    }
+  }, []);
+
+  const handleDeselectZone = useCallback(() => {
+    setSelectedZone(null);
+  }, []);
+
+  const handleToggleLayer = useCallback((layerKey: keyof ActiveLayers) => {
+    setLayers((prev) => ({ ...prev, [layerKey]: !prev[layerKey] }));
+  }, []);
+
+  const handleZoomIn = useCallback(() => {
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.zoomIn();
+    } else {
+      setZoom((prev) => Math.min(prev + 1, 18));
+    }
+  }, []);
+
+  const handleZoomOut = useCallback(() => {
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.zoomOut();
+    } else {
+      setZoom((prev) => Math.max(prev - 1, 6));
+    }
+  }, []);
+
+  const handleRecenter = useCallback(() => {
+    const target = { lat: 27.2600, lng: 88.5400 };
+    setCenter(target);
+    setZoom(DEFAULT_MAP_ZOOM);
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.flyTo([target.lat, target.lng], DEFAULT_MAP_ZOOM, { duration: 0.8 });
+    }
+  }, []);
+
+  const handleSelectLocation = useCallback(
+    (coords: { lat: number; lng: number }) => {
+      setCenter(coords);
+      setZoom(12);
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.flyTo([coords.lat, coords.lng], 12, { duration: 0.8 });
+      }
+    },
+    []
+  );
+
+  const handleDispatchProtocol = useCallback((zone: RiskZone) => {
+    setDispatchedProtocols((prev) => ({ ...prev, [zone.id]: true }));
+    setDispatchToast(
+      `Response Protocol P1 dispatched for ${zone.name}. Diversions active on NH-10 via Reshi bypass.`
+    );
+    setTimeout(() => {
+      setDispatchToast(null);
+    }, 6000);
+  }, []);
+
+  const handleNavTabChange = (tab: NavigationTab) => {
+    setActiveNavTab(tab);
+    if (tab === 'alerts') {
+      setIsAlertsOpen(true);
+    } else if (tab === 'settings') {
+      setIsSettingsOpen(true);
+    }
+  };
+
+  const handleSelectAlert = (alertItem: Alert) => {
+    const matchedZone = riskZones.find((z) =>
+      alertItem.targetRegion.toLowerCase().includes(z.district.toLowerCase())
+    );
+    if (matchedZone) {
+      handleSelectZone(matchedZone);
+    }
+    setDispatchToast(`Focused alert sector: ${alertItem.title} (${alertItem.targetRegion})`);
+    setTimeout(() => setDispatchToast(null), 5000);
+  };
+
+  return (
+    <div className="relative w-screen h-screen overflow-hidden bg-slate-100 text-slate-800 antialiased select-none">
+      {/* 1. FULL-BLEED 100vw x 100vh GIS MAP ENGINE UNDERLAY */}
+      <div className="absolute inset-0 w-full h-full z-0">
+        <Map
+          center={center}
+          zoom={zoom}
+          basemap={basemap}
+          layers={layers}
+          riskZones={riskZones}
+          roadCorridors={roadCorridors}
+          fieldReports={fieldReports}
+          infrastructure={infrastructure}
+          selectedZone={selectedZone}
+          onSelectZone={handleSelectZone}
+          onMapClick={handleDeselectZone}
+          mapRefCallback={(instance) => {
+            mapInstanceRef.current = instance;
+          }}
+        />
+      </div>
+
+      {/* Floating Dispatch / Alert Confirmation Toast */}
+      {dispatchToast && (
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 z-40 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-panel border border-slate-800 text-xs font-semibold flex items-center gap-2.5 animate-in fade-in zoom-in-95 duration-150">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span>{dispatchToast}</span>
+          <button
+            onClick={() => setDispatchToast(null)}
+            className="text-slate-400 hover:text-white p-0.5 cursor-pointer ml-1"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
+      {/* 2. FLOATING MINIMAL HEADER */}
+      {situation && (
+        <Header
+          situation={situation}
+          riskZones={riskZones}
+          onSelectZone={handleSelectZone}
+          onOpenAlerts={() => setIsAlertsOpen(true)}
+          onSelectLocation={handleSelectLocation}
+        />
+      )}
+
+      {/* 3. FLOATING MINIMAL NAVIGATION DOCK (LEFT EDGE) */}
+      <NavigationDock
+        activeTab={activeNavTab}
+        onTabChange={handleNavTabChange}
+        unreadAlertsCount={alerts.length}
+      />
+
+      {/* 4. FLOATING BOTTOM-LEFT CONTROLS & SEVERITY LEGEND */}
+      <div className="absolute bottom-6 left-5 z-20 flex items-center gap-3 select-none pointer-events-auto">
+        <RiskLegend />
+        <MapControls
+          basemap={basemap}
+          onBasemapChange={setBasemap}
+          onZoomIn={handleZoomIn}
+          onZoomOut={handleZoomOut}
+          onRecenter={handleRecenter}
+          layers={layers}
+          onToggleLayer={handleToggleLayer}
+        />
+      </div>
+
+      {/* 5. CONTEXTUAL RIGHT DRAWER ONLY WHEN A ZONE IS SELECTED */}
+      {selectedZone && (
+        <ZoneDrawer
+          zone={selectedZone}
+          onClose={handleDeselectZone}
+          onDispatchProtocol={handleDispatchProtocol}
+          isDispatched={Boolean(dispatchedProtocols[selectedZone.id])}
+        />
+      )}
+
+      {/* 6. MODALS & FLYOUTS */}
+      <AlertsModal
+        isOpen={isAlertsOpen}
+        onClose={() => {
+          setIsAlertsOpen(false);
+          setActiveNavTab('map');
+        }}
+        alerts={alerts}
+        onSelectAlert={handleSelectAlert}
+      />
+
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => {
+          setIsSettingsOpen(false);
+          setActiveNavTab('map');
+        }}
+      />
+    </div>
+  );
+}
