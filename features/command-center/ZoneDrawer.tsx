@@ -51,14 +51,13 @@ export function ZoneDrawer({
 
   const colorMeta = RISK_COLORS[zone.riskLevel];
 
+  const [simulationPercent, setSimulationPercent] = useState<number>(40);
+
   // Handle Scenario Simulation Click
-  const handleSimulate = async () => {
+  const handleSimulate = async (percent: number = simulationPercent) => {
     setIsSimulating(true);
     try {
-      const res = await runRainfallSimulation(zone, 30);
-      // Ensure exact demonstration values as requested (e.g. 87% -> 96%)
-      res.baselineRiskScore = zone.riskScore;
-      res.simulatedRiskScore = Math.min(99, Math.max(zone.riskScore + 9, 96));
+      const res = await runRainfallSimulation(zone, percent);
       setSimulationResult(res);
     } finally {
       setIsSimulating(false);
@@ -174,58 +173,120 @@ export function ZoneDrawer({
         {/* TAB 1: OVERVIEW */}
         {activeTab === 'overview' && (
           <div className="space-y-4 pt-1">
-            {/* Simulation Feedback Card when active */}
-            {simulationResult && (
-              <div className="bg-slate-900 text-white rounded-xl p-3.5 space-y-3 shadow-md border border-slate-800 animate-in fade-in duration-150">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                    <span className="font-bold text-xs uppercase tracking-wider text-amber-400">
-                      +30% Rainfall Anomaly Simulation
-                    </span>
-                  </div>
-                  <span className="px-2 py-0.5 rounded bg-slate-800 text-[10px] font-semibold text-slate-300 border border-slate-700">
-                    SIMULATED
+            {/* What-If Rainfall Scenario Control Card */}
+            <div className="bg-gradient-to-br from-slate-900 via-slate-850 to-slate-900 text-white rounded-xl p-3.5 space-y-3 shadow-md border border-slate-700/80">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <Droplets className="w-4 h-4 text-sky-400" />
+                  <span className="font-bold text-xs uppercase tracking-wider text-sky-300">
+                    What-If Rainfall Simulation
                   </span>
                 </div>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-sky-950/80 text-sky-300 border border-sky-800">
+                  {simulationResult ? 'SCENARIO ACTIVE' : 'DECISION SUPPORT'}
+                </span>
+              </div>
 
-                <div className="grid grid-cols-2 gap-2.5">
-                  <div className="bg-slate-800/90 rounded-lg p-2.5 border border-slate-700">
-                    <div className="text-[10px] text-slate-400 uppercase font-semibold">
-                      Current Risk
-                    </div>
-                    <div className="text-xl font-bold text-white mt-0.5">
-                      {simulationResult.baselineRiskScore}%
-                    </div>
-                    <div className="text-[10px] text-slate-400">Precipitation baseline</div>
-                  </div>
-                  <div className="bg-rose-950/70 rounded-lg p-2.5 border border-rose-800">
-                    <div className="text-[10px] text-rose-300 uppercase font-semibold">
-                      Simulated Risk
-                    </div>
-                    <div className="text-xl font-bold text-rose-400 mt-0.5">
-                      {simulationResult.simulatedRiskScore}%
-                    </div>
-                    <div className="text-[10px] text-rose-300 font-medium">Critical slope failure</div>
-                  </div>
+              {/* Slider & Quick Buttons */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-slate-300 text-[11px]">Simulated Precipitation Surge:</span>
+                  <span className="font-mono font-bold text-amber-400 text-xs">+{simulationPercent}%</span>
                 </div>
-
-                <p className="text-[11px] text-slate-300 leading-relaxed bg-slate-800/40 p-2 rounded border border-slate-800">
-                  {simulationResult.summary}
-                </p>
-
-                <div className="flex items-center justify-between pt-0.5 text-[10px]">
-                  <span className="text-amber-400 font-medium">Notice: Analytical model simulation</span>
-                  <button
-                    onClick={() => setSimulationResult(null)}
-                    className="text-slate-400 hover:text-white underline cursor-pointer flex items-center gap-1"
-                  >
-                    <RotateCcw className="w-3 h-3" />
-                    <span>Dismiss</span>
-                  </button>
+                <input
+                  type="range"
+                  min={10}
+                  max={100}
+                  step={10}
+                  value={simulationPercent}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    setSimulationPercent(val);
+                    handleSimulate(val);
+                  }}
+                  className="w-full accent-amber-400 h-1.5 bg-slate-700 rounded-lg cursor-pointer"
+                />
+                <div className="flex items-center gap-1.5 pt-1">
+                  {[20, 40, 60, 100].map((pct) => (
+                    <button
+                      key={pct}
+                      onClick={() => {
+                        setSimulationPercent(pct);
+                        handleSimulate(pct);
+                      }}
+                      className={`flex-1 py-1 rounded text-[10px] font-bold transition-all cursor-pointer border ${
+                        simulationPercent === pct && simulationResult
+                          ? 'bg-amber-400 text-slate-950 border-amber-300 shadow-xs'
+                          : 'bg-slate-800 hover:bg-slate-750 text-slate-300 border-slate-700'
+                      }`}
+                    >
+                      +{pct}%
+                    </button>
+                  ))}
+                  {simulationResult && (
+                    <button
+                      onClick={() => {
+                        setSimulationResult(null);
+                        setSimulationPercent(40);
+                      }}
+                      className="px-2 py-1 rounded text-[10px] font-semibold text-slate-400 hover:text-white bg-slate-800 border border-slate-700 cursor-pointer"
+                      title="Reset to live baseline"
+                    >
+                      Reset
+                    </button>
+                  )}
                 </div>
               </div>
-            )}
+
+              {/* Visual NOW vs WHAT IF vs DELTA Comparison */}
+              {simulationResult && (
+                <div className="space-y-2.5 pt-2 border-t border-slate-800 animate-in fade-in duration-150">
+                  <div className="grid grid-cols-3 gap-1.5 text-center">
+                    <div className="bg-slate-800/90 rounded-lg p-2 border border-slate-700">
+                      <div className="text-[9px] text-slate-400 uppercase font-bold">NOW</div>
+                      <div className="text-base font-extrabold text-white mt-0.5">
+                        {simulationResult.baselineRiskScore}%
+                      </div>
+                      <div className="text-[9px] text-slate-400">Baseline</div>
+                    </div>
+                    <div className="bg-rose-950/70 rounded-lg p-2 border border-rose-800">
+                      <div className="text-[9px] text-rose-300 uppercase font-bold">WHAT IF</div>
+                      <div className="text-base font-extrabold text-rose-400 mt-0.5">
+                        {simulationResult.simulatedRiskScore}%
+                      </div>
+                      <div className="text-[9px] text-rose-300 font-medium">+{simulationResult.rainfallIncreasePercent}% Rain</div>
+                    </div>
+                    <div className="bg-amber-950/70 rounded-lg p-2 border border-amber-800">
+                      <div className="text-[9px] text-amber-300 uppercase font-bold">DELTA</div>
+                      <div className="text-base font-extrabold text-amber-400 mt-0.5">
+                        {simulationResult.riskDelta && simulationResult.riskDelta > 0
+                          ? `+${simulationResult.riskDelta}`
+                          : `+${simulationResult.simulatedRiskScore - simulationResult.baselineRiskScore}`}
+                      </div>
+                      <div className="text-[9px] text-amber-300 font-medium">pct points</div>
+                    </div>
+                  </div>
+
+                  {simulationResult.changedResponsePriority && (
+                    <div className="bg-rose-900/40 border border-rose-700/60 rounded-lg p-2 text-[11px] flex items-center justify-between">
+                      <span className="text-rose-300 font-medium">Response Priority Shift:</span>
+                      <span className="font-bold text-rose-200">{simulationResult.changedResponsePriority}</span>
+                    </div>
+                  )}
+
+                  {simulationResult.affectedInfrastructure && simulationResult.affectedInfrastructure.length > 0 && (
+                    <div className="space-y-1 text-[10px] bg-slate-800/60 p-2 rounded border border-slate-750">
+                      <div className="font-bold text-slate-300">Vulnerable Lifelines & Roads:</div>
+                      <ul className="list-disc list-inside space-y-0.5 text-slate-400">
+                        {simulationResult.affectedInfrastructure.map((inf, i) => (
+                          <li key={i}>{inf}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* ML Model Provenance & SHAP Explainability */}
             <div className="bg-slate-50 rounded-xl p-3 border border-slate-200/80 space-y-2">
@@ -540,7 +601,7 @@ export function ZoneDrawer({
 
         {/* Secondary Simulation Action Button */}
         <button
-          onClick={handleSimulate}
+          onClick={() => handleSimulate(simulationPercent)}
           disabled={isSimulating}
           className="w-full py-2.5 px-4 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer"
         >
@@ -549,8 +610,8 @@ export function ZoneDrawer({
             {isSimulating
               ? 'Computing Hydrological Strain...'
               : simulationResult
-              ? 'Re-run Rainfall Simulation (+30%)'
-              : 'Simulate Rainfall Scenario (+30%)'}
+              ? `Re-run Rainfall Simulation (+${simulationPercent}%)`
+              : `Simulate Rainfall Scenario (+${simulationPercent}%)`}
           </span>
         </button>
 
